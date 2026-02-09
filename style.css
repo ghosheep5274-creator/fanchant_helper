@@ -1,0 +1,244 @@
+/* style.css - 最終完整版 */
+
+body {
+    background-color: #000000;
+    color: #444;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    overflow: hidden; /* 禁止滑動 */
+    margin: 0;
+    height: 100vh;
+}
+
+/* --- 啟動畫面 --- */
+#start-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.neon-text {
+    color: #fff;
+    text-shadow: 0 0 10px #AB46D2, 0 0 20px #AB46D2, 0 0 40px #AB46D2;
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+#btn-start {
+    background: #AB46D2;
+    color: white;
+    border: none;
+    padding: 20px 40px;
+    font-size: 24px;
+    border-radius: 50px;
+    box-shadow: 0 0 20px #AB46D2;
+    cursor: pointer;
+}
+
+/* --- 播放畫面 --- */
+#play-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* 底部對齊 */
+    align-items: center;
+    height: 100vh;
+    padding-bottom: 110px;
+    box-sizing: border-box;
+}
+
+/* --- 💜 視覺節拍器 (修正版：左右來回碰撞) --- */
+
+#metronome-container {
+    width: 200px;
+    height: 50px;
+    margin: 0 auto 10px auto;
+    border-bottom: 2px solid rgba(171, 70, 210, 0.3);
+    position: relative;
+    display: flex;
+    justify-content: center; /* 雖然有 absolute，但這個可以留著保底 */
+}
+
+#metronome-icon {
+    font-size: 30px;
+    position: absolute;
+    top: 10px;
+    
+    /* 關鍵修改說明：
+       1. 時間改為 0.705s (這是 85 BPM 的一拍長度)
+       2. 加入 'alternate' (這是讓它「來回播放」的關鍵指令)
+       3. ease-in-out 讓它在兩端會減速，像真的鐘擺
+    */
+    animation: swing-beat 0.705s infinite alternate ease-in-out;
+}
+
+/* 定義動作：從最左邊 (from) 到最右邊 (to) */
+@keyframes swing-beat {
+    from { 
+        left: 0; 
+        transform: rotate(-20deg) scale(1); /* 向左傾斜 */
+        text-shadow: -5px 0 10px #AB46D2;   /* 左邊發光 */
+    }
+    to { 
+        left: 170px; /* 跑到右邊 (容器寬 200 - 愛心寬 30) */
+        transform: rotate(20deg) scale(1.1); /* 向右傾斜 + 稍微變大 */
+        text-shadow: 5px 0 10px #AB46D2;     /* 右邊發光 */
+    }
+}
+
+/* --- ⏱️ 同步時鐘 --- */
+#sync-timer {
+    font-family: 'Courier New', monospace;
+    font-size: 24px;
+    font-weight: bold;
+    color: #00ff00;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 5px 15px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    margin-bottom: 20px;
+    width: fit-content;
+}
+
+/* --- 歌詞與特效 --- */
+#lyric-box {
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1.2;
+    width: 90%;
+    max-width: 600px;
+    word-wrap: break-word;
+    min-height: 80px;
+    transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.active { transform: scale(1.1); color: white; }
+/* .type-chant { text-shadow: 0 0 20px #AB46D2; }*/
+.type-chant {
+    color: #ffffff; /* 文字本體純白 */
+    font-weight: 900; /* 特粗體，增加發光面積 */
+    
+    /* 關鍵魔法：多層次陰影疊加 */
+    text-shadow: 
+        0 0 5px  #ffffff,   /* 第1層：緊貼文字的白光核心 (提升清晰度) */
+        0 0 15px #AB46D2,   /* 第2層：高強度的內部紫光 */
+        0 0 30px #AB46D2,   /* 第3層：中等範圍的紫光暈染 */
+        0 0 50px #AB46D2,   /* 第4層：大範圍擴散光暈 */
+        0 0 80px rgba(171, 70, 210, 0.6); /* 第5層：超大範圍的環境氛圍光 (半透明) */
+        
+    /* 讓它稍微放大一點點，增加衝擊力 */
+    transform: scale(1.15); 
+    transition: all 0.1s ease-out;
+}
+.type-sing { color: #00ffff; font-style: italic; font-size: 0.8em; text-shadow: 0 0 10px #00aaaa; }
+.icon-sing::before { content: "🎤 "; }
+.type-scream { color: #ff0055; font-size: 1.2em; animation: shake 0.5s infinite; }
+.icon-scream::before { content: "😱 "; }
+.icon-wave::before { content: "🔦 "; }
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+/* --- 🚨 警告模式 --- */
+body.warning-mode {
+    border: 15px solid transparent;
+    border-image: repeating-linear-gradient(45deg, #ff0000, #ff0000 10px, #000000 10px, #000000 20px) 10;
+    animation: warning-pulse 0.5s infinite alternate;
+}
+@keyframes warning-pulse { from { box-shadow: inset 0 0 20px #ff0000; } to { box-shadow: inset 0 0 50px #ff0000; } }
+
+/* --- 底部按鈕 --- */
+.controls {
+    position: fixed;
+    bottom: 30px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    z-index: 10;
+}
+.controls button {
+    background: rgba(50, 50, 50, 0.8);
+    color: #fff;
+    border: 1px solid #555;
+    padding: 12px;
+    border-radius: 30px;
+    font-size: 14px;
+    width: 45%;
+    backdrop-filter: blur(5px);
+}
+
+/* --- 🆕 說明按鈕 (右上角懸浮) --- */
+#btn-help {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 2px solid #AB46D2;
+    color: #AB46D2;
+    border-radius: 50%; /* 變圓形 */
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 100;
+    transition: all 0.3s;
+}
+
+#btn-help:hover {
+    background: #AB46D2;
+    color: white;
+    box-shadow: 0 0 10px #AB46D2;
+}
+
+/* --- 🆕 說明彈窗 (Modal) --- */
+#help-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9); /* 深黑半透明背景 */
+    z-index: 9999;
+    display: none; /* 預設隱藏，由 JS 控制 */
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px); /* 背景模糊，更有質感 */
+}
+
+.help-card {
+    background: #111;
+    border: 2px solid #444;
+    width: 85%;
+    max-width: 400px;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: left;
+    box-shadow: 0 0 30px rgba(171, 70, 210, 0.4);
+    animation: popIn 0.3s ease-out;
+}
+
+.help-content p {
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+
+.help-content strong {
+    color: #fff;
+    font-size: 16px;
+}
+
+/* 彈窗出現動畫 */
+@keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}

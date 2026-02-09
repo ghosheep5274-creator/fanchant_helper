@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Purple Mic Drop</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 防止手機點擊閃爍 */
+        * { -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<body>
+    <div id="start-screen">
+        <h1 class="neon-text">MIC DROP</h1>
+        <button id="btn-help" onclick="toggleHelp(true)">?</button>
+        
+        <div style="font-size: 14px; color: #888; margin-bottom: 5px;">
+            Ver: <span style="color: #00ff00;">1.2</span>
+        </div>
+        <div onclick="window.location.reload(true)" style="color: #AB46D2; text-decoration: underline; cursor: pointer; font-size: 12px; margin-bottom: 30px;">
+            🔄 沒看到新歌？點我強制更新
+        </div>
+
+        <button id="btn-start">START</button>
+        
+        <a href="training.html" style="margin-top: 20px; color: #fff; text-decoration: none; border: 1px solid #AB46D2; padding: 10px 20px; border-radius: 20px; font-size: 14px;">
+            🏆 進入特訓中心 (領證書)
+        </a>
+
+        <div style="font-size: 10px; color: #555; margin-top: 40px;">
+            Special thanks to ARMY for guides.<br>
+            Built with 💜.
+        </div>
+    </div>
+
+    <div id="play-screen" style="display:none;">
+        
+        <div id="metronome-container">
+            <div id="metronome-icon">💜</div>
+        </div>
+
+        <div id="sync-timer">00:00.0</div>
+
+        <div id="lyric-box">Waiting for beat...</div>
+        
+        <div class="controls">
+            <button onclick="adjustTime(-100)">⚡️ 字太慢 (點我追上)</button>
+            <button onclick="adjustTime(100)">🐢 字太快 (點我等等)</button>
+        </div>
+    </div>
+
+    <script src="mic_drop.js?v=2"></script>
+    <script src="app.js?v=2"></script>
+
+    <div id="help-modal" style="display:none;">
+    <div class="help-card">
+        <h2 style="color:#AB46D2; margin-bottom:10px;">💜 作戰守則</h2>
+        
+        <div class="help-content">
+            <p><strong>1. 雙機流操作：</strong><br>一個設備放音樂 (Spotify/YT)，另一個設備開 APP。</p>
+            <p><strong>2. 同步技巧：</strong><br>聽到音樂開始，按下 <span style="color:#AB46D2">START</span>。<br>盯著搖擺愛心💜，若撞牆時機跟鼓聲對不上，請按下方按鈕微調。</p>
+            <p><strong>3. 視覺暗號：</strong><br>
+            <span style="color:#fff; text-shadow:0 0 5px #AB46D2">紫色字</span>：用力吼 (Chant)<br>
+            <span style="color:#00ffff">青色字</span>：跟著唱 (Sing)<br>
+            <span style="color:#ff0055">紅色閃爍</span>：尖叫 (Scream)</p>
+            <p><strong>⚠️ iPhone 用戶注意：</strong><br>如果沒震動，請至 設定 > 聲音與觸覺回饋 > 開啟「系統觸覺回饋」。</p>
+        </div>
+
+        <button class="close-btn" onclick="toggleHelp(false)">I'm Ready!</button>
+    </div>
+</div>
+</body>
+</html>
