@@ -46,8 +46,8 @@
         <div id="lyric-box">Waiting for beat...</div>
         
         <div class="controls">
-            <button onclick="adjustTime(-100)">⚡️ 字太慢 (點我追上)</button>
-            <button onclick="adjustTime(100)">🐢 字太快 (點我等等)</button>
+            <button onclick="adjustTime(-100)">⚡️ 字太快</button>
+            <button onclick="adjustTime(100)">🐢 字太慢</button>
         </div>
     </div>
 
@@ -69,6 +69,24 @@
         </div>
 
         <button class="close-btn" onclick="toggleHelp(false)">I'm Ready!</button>
+    </div>
+</div>
+
+<div id="beta-cert-overlay" style="display:none;">
+    <div class="cert-card beta-style">
+        <div class="stamp">TOP SECRET</div>
+        <h2>MISSION COMPLETE</h2>
+        <p style="color:#aaa; font-size:12px;">PROJECT BORAHAE: ALPHA TEST</p>
+        
+        <div class="cert-content">
+            <h1 class="neon-text" style="font-size:30px; margin:20px 0;">Mic Drop<br>Master</h1>
+            <p>茲證明 <strong>ARMY 001</strong></p>
+            <p>已成功執行 Mic Drop 應援測試任務。</p>
+            <p style="font-size:12px; color:#666; margin-top:15px;">Date: 2026.02.09 (Beta)</p>
+        </div>
+
+        <div style="margin-top:20px; color:#AB46D2; font-size:12px;">Verified by CEO</div>
+        <button onclick="closeCertificate()" class="close-btn">關閉並返回首頁 (截圖留念)</button>
     </div>
 </div>
 </body>
