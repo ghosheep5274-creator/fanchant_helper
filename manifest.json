@@ -1,9 +1,7 @@
 {
     "name": "Purple Mic",
     "short_name": "PurpleMic",
-    /* 這裡必須包含妳的專案名稱 */
     "start_url": "/mic-drop-test/index.html",
-    /* 告訴 iPhone 這個 APP 的範圍就在這個資料夾裡 */
     "scope": "/mic-drop-test/",
     "display": "standalone",
     "background_color": "#000000",
@@ -16,3 +14,4 @@
         }
     ]
 }
+
