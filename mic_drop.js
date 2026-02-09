@@ -98,10 +98,11 @@ const songData = [
     { "time": 225232, "text": "막", "type": "sing" },
     { "time": 227345, "text": "폼나지-①", "type": "sing" },
     { "time": 228786, "text": "폼나지-②", "type": "sing" },
-    { "time": 230212 "text": "scream!", "type": "scream" },
+    { "time": 230212, "text": "scream!", "type": "scream" },
 
 
     // --- 🏆 結業證書觸發 ---
     { "time": 239000, "text": "", "type": "end" }
 
 ];
+
