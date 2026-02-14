@@ -1,5 +1,5 @@
-// app.js - Project Borahae 最終修正版 (2026.02.14)
-// 特性：修復「回首頁自動重播」Bug + 完整視覺特效 + 防呆機制
+// app.js - Project Borahae 雙核心究極版 (2026.02.14)
+// 特性：支援「線上影音模式」與「離線純文字模式」切換 + 完整特效
 
 let player;
 let isVideoReady = false;
@@ -8,14 +8,34 @@ let animationFrameId;
 let offset = 0; 
 let lastRenderedText = "";
 
+// 🆕 新增變數：離線模式專用的起始時間與模式標記
+let startTime = 0; 
+let useYoutubeMode = true; 
+
 // [介面元素抓取]
 const startScreen = document.getElementById('start-screen');
 const playScreen = document.getElementById('play-screen');
 const lyricBox = document.getElementById('lyric-box');
 const syncTimer = document.getElementById('sync-timer');
 const btnStart = document.getElementById('btn-start');
+const musicToggle = document.getElementById('music-toggle'); // 抓取開關
+const modeText = document.getElementById('mode-text');
 
-// [區域 A] YouTube API 初始化
+// [區域 A] 切換開關監聽 (UI互動)
+if (musicToggle) {
+    musicToggle.addEventListener('change', (e) => {
+        useYoutubeMode = e.target.checked;
+        if (useYoutubeMode) {
+            modeText.innerText = "🎵 音樂模式 (需網路)";
+            modeText.style.color = "#AB46D2";
+        } else {
+            modeText.innerText = "🔕 離線模式 (純文字)";
+            modeText.style.color = "#aaa";
+        }
+    });
+}
+
+// [區域 B] YouTube API 初始化
 function onYouTubeIframeAPIReady() {
     console.log("Loading YouTube API...");
     player = new YT.Player('player', {
@@ -23,118 +43,105 @@ function onYouTubeIframeAPIReady() {
         width: '0',
         videoId: 'e95-Gaj2iXM', 
         playerVars: {
-            'autoplay': 0,
-            'controls': 0,
-            'disablekb': 1,
-            'playsinline': 1,
-            'rel': 0
+            'autoplay': 0, 'controls': 0, 'disablekb': 1, 'playsinline': 1, 'rel': 0
         },
         events: {
-            'onReady': () => { 
-                isVideoReady = true; 
-                console.log("YouTube Player Ready!");
-            },
+            'onReady': () => { isVideoReady = true; console.log("YouTube Player Ready!"); },
             'onStateChange': onPlayerStateChange
         }
     });
 }
 
-// [區域 B] 狀態監聽 (新增：防偷跑機制)
+// [區域 C] 狀態監聽
 function onPlayerStateChange(event) {
-    // 🔴 防偷跑：如果在首頁 (startScreen 顯示中)，禁止播放
+    // 防偷跑：如果在首頁，禁止播放
     if (startScreen && startScreen.style.display !== 'none') {
-        if (event.data === YT.PlayerState.PLAYING) {
-            player.stopVideo(); // 強制停止
-            console.log("Blocked auto-play on start screen");
-        }
+        if (event.data === YT.PlayerState.PLAYING) player.stopVideo();
         return;
     }
 
-    if (event.data === YT.PlayerState.PLAYING) {
-        isPlaying = true;
-        updateLoop();
-    } else if (event.data === YT.PlayerState.ENDED) {
-        isPlaying = false;
-        cancelAnimationFrame(animationFrameId);
-        showCertificate(); 
-    } else {
-        isPlaying = false;
-        cancelAnimationFrame(animationFrameId);
+    if (useYoutubeMode) {
+        if (event.data === YT.PlayerState.PLAYING) {
+            isPlaying = true;
+            updateLoop();
+        } else if (event.data === YT.PlayerState.ENDED) {
+            finishGame();
+        } else {
+            isPlaying = false;
+            cancelAnimationFrame(animationFrameId);
+        }
     }
 }
 
-// [區域 C] 啟動邏輯
+// [區域 D] 啟動邏輯 (雙核心分流)
 if (btnStart) {
     btnStart.addEventListener('click', () => {
-        if (!isVideoReady || !player) {
-            alert("影片載入中，請稍候...");
-            return;
-        }
-
-        if (document.documentElement.requestFullscreen) {
-            document.documentElement.requestFullscreen().catch(e => console.log(e));
-        }
         
-        startScreen.style.display = 'none';
-        playScreen.style.display = 'flex';
+        // 核心分支 1: 音樂模式 (檢查 YouTube)
+        if (useYoutubeMode) {
+            if (!isVideoReady || !player) {
+                alert("YouTube 載入中... 若無網路請切換至「離線模式」");
+                return;
+            }
+            enterPlayScreen();
+            player.playVideo(); // 讓 YouTube 驅動 updateLoop
+        } 
         
-        player.playVideo();
+        // 核心分支 2: 離線模式 (使用系統時鐘)
+        else {
+            enterPlayScreen();
+            startTime = Date.now(); // 紀錄現在時間
+            isPlaying = true;
+            updateLoop(); // 手動啟動循環
+        }
     });
 }
 
-// 1. 動態建立提示框元件 (不用改 HTML)
-const toast = document.createElement('div');
-toast.className = 'toast';
-document.body.appendChild(toast);
+function enterPlayScreen() {
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(e => console.log(e));
+    }
+    startScreen.style.display = 'none';
+    playScreen.style.display = 'flex';
+}
 
-let toastTimeout;
-
-// 2. 強制綁定到 window (解決按鈕沒反應的問題)
-window.adjustTime = function(ms) {
-    offset += ms;
-    
-    // 震動回饋
-    if (navigator.vibrate) navigator.vibrate(20);
-    
-    // 視覺回饋：顯示目前的偏移量
-    const sign = offset > 0 ? '+' : '';
-    toast.innerText = `校正: ${sign}${offset}ms`;
-    
-    // 顯示動畫
-    toast.classList.add('show');
-    
-    // 1秒後自動消失
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => {
-        toast.classList.remove('show');
-    }, 1000);
-    
-    console.log(`Current Offset: ${offset}ms`); // Debug 用
-};
-
-// [區域 D] 核心循環
+// [區域 E] 核心循環 (雙引擎)
 function updateLoop() {
-    if (!isPlaying || !player || typeof songData === 'undefined') return; 
+    if (!isPlaying) return;
     
-    let ytTime = player.getCurrentTime() * 1000;
+    // 防止資料未載入
+    if (typeof songData === 'undefined') return;
 
-    if (ytTime === 0 && isPlaying) {
-        animationFrameId = requestAnimationFrame(updateLoop);
-        return;
+    let currentMs = 0;
+
+    // --- 🕒 時間獲取邏輯分流 ---
+    if (useYoutubeMode) {
+        // 引擎 A: 依賴 YouTube 進度
+        if (!player || typeof player.getCurrentTime !== 'function') return;
+        currentMs = player.getCurrentTime() * 1000;
+        
+        // 0秒防呆 (YouTube 剛載入時會回傳 0)
+        if (currentMs === 0) {
+            animationFrameId = requestAnimationFrame(updateLoop);
+            return;
+        }
+    } else {
+        // 引擎 B: 依賴系統時間 (離線)
+        currentMs = Date.now() - startTime;
     }
 
-    const currentTime = ytTime + offset; 
+    // 計算最終時間 (加上手動微調)
+    const currentTime = currentMs + offset; 
     renderSyncTimer(currentTime);
 
+    // 比對歌詞
     const currentLyric = songData.reduce((prev, curr) => {
         return (curr.time <= currentTime) ? curr : prev;
     }, songData[0]);
 
     if (currentLyric) {
         if (currentLyric.type === 'end') {
-            showCertificate();
-            isPlaying = false;
-            player.pauseVideo();
+            finishGame();
             return; 
         }
         render(currentLyric);
@@ -143,11 +150,11 @@ function updateLoop() {
     animationFrameId = requestAnimationFrame(updateLoop);
 }
 
-// [區域 E] 渲染邏輯 (特效版)
+// [區域 F] 渲染邏輯 (特效保留)
 function render(lyricObj) {
     if (!lyricBox) return;
 
-    // 1. 警告模式
+    // 警告模式
     if (lyricObj.type === 'warning') {
         document.body.classList.add('warning-mode');
         if (lastRenderedText !== lyricObj.text) {
@@ -160,7 +167,7 @@ function render(lyricObj) {
         document.body.classList.remove('warning-mode');
     }
 
-    // 2. 一般歌詞 (含 Sing/Scream/Icon)
+    // 一般歌詞
     if (lastRenderedText !== lyricObj.text) {
         lyricBox.innerText = lyricObj.text;
         lyricBox.className = ""; 
@@ -184,7 +191,14 @@ function render(lyricObj) {
     }
 }
 
-// [區域 F] 輔助功能
+// [區域 G] 輔助與結束功能
+function finishGame() {
+    isPlaying = false;
+    cancelAnimationFrame(animationFrameId);
+    if (useYoutubeMode && player) player.pauseVideo();
+    showCertificate();
+}
+
 function renderSyncTimer(ms) {
     if (!syncTimer) return;
     if (ms < 0) ms = 0;
@@ -196,6 +210,23 @@ function renderSyncTimer(ms) {
     
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
+
+// 動態建立提示框元件
+const toast = document.createElement('div');
+toast.className = 'toast';
+document.body.appendChild(toast);
+let toastTimeout;
+
+window.adjustTime = function(ms) {
+    offset += ms;
+    if (navigator.vibrate) navigator.vibrate(20);
+    
+    const sign = offset > 0 ? '+' : '';
+    toast.innerText = `校正: ${sign}${offset}ms`;
+    toast.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 1000);
+};
 
 function showCertificate() {
     const cert = document.getElementById('beta-cert-overlay');
@@ -214,24 +245,24 @@ function toggleHelp(show) {
     if (helpModal) helpModal.style.display = show ? 'flex' : 'none';
 }
 
-// 🔴 這裡修復了：移除 seekTo(0)，防止自動重播
 function closeCertificate() {
     const cert = document.getElementById('beta-cert-overlay');
     if (cert) cert.style.display = 'none';
     
-    // 只做 stopVideo，它會自動歸零且進入停止狀態
+    // 切換回首頁
+    if (playScreen) playScreen.style.display = 'none';
+    if (startScreen) startScreen.style.display = 'flex';
+
+    // 停止影片 (如果有的話)
     if (player && typeof player.stopVideo === 'function') {
         player.stopVideo(); 
     }
     
     isPlaying = false;
     offset = 0;
+    startTime = 0;
     lastRenderedText = ""; 
     cancelAnimationFrame(animationFrameId);
     
-    if (playScreen) playScreen.style.display = 'none';
-    if (startScreen) startScreen.style.display = 'flex';
-    
     if (navigator.vibrate) navigator.vibrate(50);
 }
-
