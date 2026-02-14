@@ -82,10 +82,35 @@ if (btnStart) {
     });
 }
 
-function adjustTime(ms) {
+// 1. 動態建立提示框元件 (不用改 HTML)
+const toast = document.createElement('div');
+toast.className = 'toast';
+document.body.appendChild(toast);
+
+let toastTimeout;
+
+// 2. 強制綁定到 window (解決按鈕沒反應的問題)
+window.adjustTime = function(ms) {
     offset += ms;
+    
+    // 震動回饋
     if (navigator.vibrate) navigator.vibrate(20);
-}
+    
+    // 視覺回饋：顯示目前的偏移量
+    const sign = offset > 0 ? '+' : '';
+    toast.innerText = `校正: ${sign}${offset}ms`;
+    
+    // 顯示動畫
+    toast.classList.add('show');
+    
+    // 1秒後自動消失
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 1000);
+    
+    console.log(`Current Offset: ${offset}ms`); // Debug 用
+};
 
 // [區域 D] 核心循環
 function updateLoop() {
@@ -209,3 +234,4 @@ function closeCertificate() {
     
     if (navigator.vibrate) navigator.vibrate(50);
 }
+
