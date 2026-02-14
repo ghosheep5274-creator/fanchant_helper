@@ -444,3 +444,17 @@ input:checked + .slider:before {
     background-position: right 1.2em top 50%;
     background-size: .8em auto;
 }
+
+/* style.css 加入以下代碼 */
+
+/* 針對被禁用的選項進行美化 */
+#song-select option:disabled {
+    color: #555; /* 更深的灰色，與背景區隔 */
+    font-style: italic; /* 斜體展現預告感 */
+    background-color: #1a1a1a; /* 稍微暗一點的背景 */
+}
+
+/* 如果你想讓整個選單在展開時，未開放的歌曲看起來更神祕 */
+#song-select option[disabled]::after {
+    content: " 🔒"; /* 雖然 option 不支援 ::after，但這是一個好的設計備忘 */
+}
