@@ -321,70 +321,49 @@ body.warning-mode {
 .toast.show { opacity: 1; }
 
 
-/* style.css 最下方加入 */
-
-/* --- 音樂模式切換開關 --- */
+/* --- 2. 音樂切換：改為簡約設計，去除厚重外框 --- */
 .mode-switch-container {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    background: rgba(30, 30, 30, 0.8);
-    padding: 10px 20px;
-    border-radius: 30px;
-    border: 1px solid #444;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    background: transparent; /* 去除背景 */
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(171, 70, 210, 0.2); /* 改用細細的底線區隔 */
+    width: fit-content;
 }
 
 #mode-text {
-    font-size: 14px;
-    color: #ddd;
-    font-weight: bold;
+    font-size: 12px; /* 縮小文字，標示它是次要設定 */
+    color: #888;
+    font-weight: normal;
+    letter-spacing: 1px;
 }
 
-/* Toggle Switch 本體 */
+/* 縮小 Toggle Switch 的尺寸，讓它更精緻 */
 .switch {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 26px;
-}
-
-.switch input { 
-    opacity: 0;
-    width: 0;
-    height: 0;
+    width: 40px;
+    height: 20px;
 }
 
 .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #555;
-    transition: .4s;
-    border-radius: 34px;
+    background-color: #333;
+    border-radius: 20px;
 }
 
 .slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
+    height: 14px;
+    width: 14px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #AB46D2; /* 紫色開啟 */
-    box-shadow: 0 0 10px #AB46D2;
 }
 
 input:checked + .slider:before {
-    transform: translateX(24px);
+    transform: translateX(20px);
 }
-
 /* style.css 最下方加入 */
 
 /* 🆕 左上角回首頁按鈕 */
@@ -440,30 +419,28 @@ input:checked + .slider:before {
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(171, 70, 210, 0); }
 }
 
-/* style.css 最下方 */
-
+/* --- 1. 選歌單：維持焦點，增加立體感 --- */
 .song-selector-container {
-    margin-bottom: 20px;
-    width: 80%;
-    max-width: 300px;
+    margin-bottom: 30px; /* 增加與按鈕的距離 */
+    width: 85%;
+    max-width: 320px;
 }
 
 #song-select {
     width: 100%;
-    padding: 12px 20px;
-    font-size: 16px;
-    background: rgba(30, 30, 30, 0.9);
+    padding: 15px 25px;
+    font-size: 18px; /* 字體稍微放大 */
+    background: rgba(20, 20, 20, 0.9);
     color: #fff;
     border: 2px solid #AB46D2;
-    border-radius: 30px;
+    border-radius: 50px; /* 膠囊型外觀 */
     outline: none;
     cursor: pointer;
     text-align: center;
-    appearance: none; /* 移除預設醜醜的箭頭 */
+    box-shadow: 0 4px 15px rgba(171, 70, 210, 0.3); /* 加入淡淡的紫光 */
+    appearance: none;
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23AB46D2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
     background-repeat: no-repeat;
-    background-position: right .7em top 50%;
-    background-size: .65em auto;
+    background-position: right 1.2em top 50%;
+    background-size: .8em auto;
 }
-
-
