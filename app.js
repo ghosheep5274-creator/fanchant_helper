@@ -1,5 +1,4 @@
-// app.js - 最終人性化版 (回首頁 + 暫停功能)
-// 特性：雙核心模式 + 完整暫停邏輯 + 強制回首頁
+// app.js - 多歌曲結構化版 (2026.02.14)
 
 let player;
 let isVideoReady = false;
@@ -8,10 +7,13 @@ let animationFrameId;
 let offset = 0; 
 let lastRenderedText = "";
 
-// 時間控制變數
 let startTime = 0; 
 let useYoutubeMode = true; 
-let pauseStartTime = 0; // 紀錄暫停當下的時間
+let pauseStartTime = 0;
+
+// 🆕 新增：當前選中的歌曲資料
+let currentSongData = []; 
+let currentSongId = "mic_drop"; 
 
 // [介面元素抓取]
 const startScreen = document.getElementById('start-screen');
@@ -21,24 +23,21 @@ const syncTimer = document.getElementById('sync-timer');
 const btnStart = document.getElementById('btn-start');
 const musicToggle = document.getElementById('music-toggle'); 
 const modeText = document.getElementById('mode-text');
-const btnPause = document.getElementById('btn-pause'); // 抓暫停鈕
+const btnPause = document.getElementById('btn-pause');
+const songSelect = document.getElementById('song-select'); // 抓取選單
 
 // [區域 A] 切換開關監聽
 if (musicToggle) {
     musicToggle.addEventListener('change', (e) => {
         useYoutubeMode = e.target.checked;
-        if (useYoutubeMode) {
-            modeText.innerText = "🎵 音樂模式 (需網路)";
-            modeText.style.color = "#AB46D2";
-        } else {
-            modeText.innerText = "🔕 離線模式 (純文字)";
-            modeText.style.color = "#aaa";
-        }
+        modeText.innerText = useYoutubeMode ? "🎵 音樂模式 (需網路)" : "🔕 離線模式 (純文字)";
+        modeText.style.color = useYoutubeMode ? "#AB46D2" : "#aaa";
     });
 }
 
 // [區域 B] YouTube API 初始化
 function onYouTubeIframeAPIReady() {
+    // 預設先載入 Mic Drop，但之後會根據選擇切換
     player = new YT.Player('player', {
         height: '0', width: '0', videoId: 'e95-Gaj2iXM', 
         playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'playsinline': 1, 'rel': 0 },
@@ -49,21 +48,20 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
-// [區域 C] 狀態監聽 (整合暫停狀態 UI)
+// [區域 C] 狀態監聽
 function onPlayerStateChange(event) {
     if (startScreen && startScreen.style.display !== 'none') {
         if (event.data === YT.PlayerState.PLAYING) player.stopVideo();
         return;
     }
-
     if (useYoutubeMode) {
         if (event.data === YT.PlayerState.PLAYING) {
             isPlaying = true;
-            updatePauseButton(true); // 變為 "暫停"
+            updatePauseButton(true);
             updateLoop();
         } else if (event.data === YT.PlayerState.PAUSED) {
             isPlaying = false;
-            updatePauseButton(false); // 變為 "播放"
+            updatePauseButton(false);
             cancelAnimationFrame(animationFrameId);
         } else if (event.data === YT.PlayerState.ENDED) {
             finishGame();
@@ -71,9 +69,13 @@ function onPlayerStateChange(event) {
     }
 }
 
-// [區域 D] 啟動與暫停邏輯
+// [區域 D] 啟動與載入邏輯 (關鍵修改)
 if (btnStart) {
     btnStart.addEventListener('click', () => {
+        // 1. 讀取使用者選了哪首歌
+        const selectedValue = songSelect ? songSelect.value : "mic_drop";
+        loadSong(selectedValue);
+
         if (useYoutubeMode) {
             if (!isVideoReady || !player) {
                 alert("YouTube 載入中...");
@@ -91,6 +93,37 @@ if (btnStart) {
     });
 }
 
+// 🆕 載入歌曲函式
+function loadSong(songKey) {
+    // 從資料庫抓資料
+    const song = songLibrary[songKey];
+    if (!song) {
+        alert("資料庫錯誤：找不到歌曲 " + songKey);
+        return;
+    }
+
+    // 1. 設定歌詞數據
+    currentSongData = song.data;
+    currentSongId = songKey;
+
+    // 2. 設定 YouTube 影片 (如果是不同首才載入)
+    if (player && typeof player.loadVideoById === 'function') {
+        // 如果現在 player 裡的 ID 跟我要的不一樣，就載入新的
+        // 注意：這裡簡化處理，直接 loadVideoById 會自動重頭載入
+        player.loadVideoById(song.videoId);
+    }
+
+    // 3. 設定愛心 BPM 速度 (修改 CSS 變數或樣式)
+    const heart = document.getElementById('metronome-icon');
+    if (heart && song.bpm) {
+        // 計算動畫週期：60秒 / BPM (例如 60/85 = 0.7秒)
+        // 因為是左右搖擺，可能需要微調倍率，這裡假設 CSS 是單次擺動
+        const duration = (60 / song.bpm) + "s";
+        heart.style.animationDuration = duration;
+        console.log(`BPM set to ${song.bpm}, duration: ${duration}`);
+    }
+}
+
 function enterPlayScreen() {
     if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen().catch(e => console.log(e));
@@ -99,75 +132,10 @@ function enterPlayScreen() {
     playScreen.style.display = 'flex';
 }
 
-// 🆕 暫停/播放 切換功能
-window.togglePlay = function() {
-    if (isPlaying) {
-        // 執行暫停
-        isPlaying = false;
-        updatePauseButton(false);
-        cancelAnimationFrame(animationFrameId);
-        
-        if (useYoutubeMode && player) {
-            player.pauseVideo();
-        } else {
-            // 離線模式：紀錄暫停開始的時間點
-            pauseStartTime = Date.now();
-        }
-    } else {
-        // 執行播放
-        isPlaying = true;
-        updatePauseButton(true);
-        
-        if (useYoutubeMode && player) {
-            player.playVideo();
-        } else {
-            // 離線模式：把「休息了多久」加回到 startTime，讓時間接續
-            const pausedDuration = Date.now() - pauseStartTime;
-            startTime += pausedDuration;
-            updateLoop();
-        }
-    }
-};
-
-// 🆕 回首頁功能 (暴力重置所有狀態)
-window.returnToHome = function() {
-    if (confirm("確定要中斷應援並回到首頁嗎？")) {
-        closeCertificate(); // 借用這個函式的重置邏輯
-    }
-};
-
-
-function updatePauseButton(active) {
-    // 1. 控制按鈕外觀
-    if (btnPause) {
-        btnPause.innerText = active ? "⏸ 暫停" : "▶️ 繼續";
-        btnPause.style.background = active ? "rgba(171, 70, 210, 0.3)" : "#AB46D2";
-        
-        // 暫停時讓按鈕閃爍，提示使用者點擊繼續
-        if (!active) {
-            btnPause.style.animation = "pulse 1.5s infinite";
-        } else {
-            btnPause.style.animation = "none";
-        }
-    }
-
-    // 2. 控制愛心凍結 (魔鬼細節)
-    const heart = document.getElementById('metronome-icon');
-    if (heart) {
-        if (active) {
-            // 播放中：移除暫停標籤，動畫繼續
-            heart.classList.remove('paused-animation');
-        } else {
-            // 暫停中：加上暫停標籤，凍結在半空中
-            heart.classList.add('paused-animation');
-        }
-    }
-}
-
-// [區域 E] 核心循環
+// [區域 E] 核心循環 (改用 currentSongData)
 function updateLoop() {
     if (!isPlaying) return;
-    if (typeof songData === 'undefined') return;
+    if (!currentSongData) return; // 防呆
 
     let currentMs = 0;
 
@@ -185,9 +153,10 @@ function updateLoop() {
     const currentTime = currentMs + offset; 
     renderSyncTimer(currentTime);
 
-    const currentLyric = songData.reduce((prev, curr) => {
+    // 🔴 改用 currentSongData
+    const currentLyric = currentSongData.reduce((prev, curr) => {
         return (curr.time <= currentTime) ? curr : prev;
-    }, songData[0]);
+    }, currentSongData[0]);
 
     if (currentLyric) {
         if (currentLyric.type === 'end') {
@@ -200,10 +169,9 @@ function updateLoop() {
     animationFrameId = requestAnimationFrame(updateLoop);
 }
 
-// [區域 F] 渲染邏輯
+// [區域 F] 渲染邏輯 (維持不變)
 function render(lyricObj) {
     if (!lyricBox) return;
-
     if (lyricObj.type === 'warning') {
         document.body.classList.add('warning-mode');
         if (lastRenderedText !== lyricObj.text) {
@@ -215,13 +183,11 @@ function render(lyricObj) {
     } else {
         document.body.classList.remove('warning-mode');
     }
-
     if (lastRenderedText !== lyricObj.text) {
         lyricBox.innerText = lyricObj.text;
         lyricBox.className = ""; 
         void lyricBox.offsetWidth; 
         lyricBox.classList.add('active');
-        
         if (lyricObj.type === 'chant') {
             lyricBox.classList.add('type-chant');
             if (navigator.vibrate) navigator.vibrate(50);
@@ -233,44 +199,36 @@ function render(lyricObj) {
         } else if (lyricObj.type === 'wave') {
             lyricBox.classList.add('type-sing', 'icon-wave');
         }
-        
         lastRenderedText = lyricObj.text;
     }
 }
 
-// [區域 G] 輔助與結束功能 - finishGame (新增次數累計功能)
+// [區域 G] 結束邏輯 (紀錄該首歌的次數)
 function finishGame() {
     isPlaying = false;
     cancelAnimationFrame(animationFrameId);
     if (useYoutubeMode && player) player.pauseVideo();
     
-    // --- 🆕 新增：特訓次數累計邏輯 ---
-    // 1. 從瀏覽器記憶取出目前的次數 (預設為 0)
-    let count = parseInt(localStorage.getItem('mic_drop_count') || '0');
-    
-    // 2. 加 1
+    // 🔴 針對特定歌曲儲存次數 (例如 mic_drop_count)
+    const storageKey = `${currentSongId}_count`;
+    let count = parseInt(localStorage.getItem(storageKey) || '0');
     count++;
+    localStorage.setItem(storageKey, count);
     
-    // 3. 存回去
-    localStorage.setItem('mic_drop_count', count);
-    
-    // 4. 顯示進度提示 (利用現有的 toast)
-    const toast = document.querySelector('.toast'); // 抓取現有的提示框
+    const toast = document.querySelector('.toast');
     if (toast) {
         if (count < 3) {
-            toast.innerText = `🔥 特訓進度: ${count}/3 (加油!)`;
+            toast.innerText = `🔥 特訓進度: ${count}/3`;
         } else {
-            toast.innerText = `🏆 恭喜！已達成 3 次練習目標！`;
-            if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]); // 慶祝震動
+            toast.innerText = `🏆 恭喜！${currentSongId} 已達成目標！`;
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
         }
-        
         toast.classList.add('show');
-        setTimeout(() => { toast.classList.remove('show'); }, 3000); // 顯示久一點 (3秒)
+        setTimeout(() => { toast.classList.remove('show'); }, 3000);
     }
-    // ---------------------------------
-
     showCertificate();
 }
+
 
 function renderSyncTimer(ms) {
     if (!syncTimer) return;
@@ -346,6 +304,7 @@ function closeCertificate() {
     
     if (navigator.vibrate) navigator.vibrate(50);
 }
+
 
 
 
