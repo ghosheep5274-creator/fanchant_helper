@@ -1,5 +1,5 @@
-// app.js - Project Borahae 最終融合完全體 (2026.02.14)
-// 特性：YouTube 精準同步 + 舊版防呆機制 + 自動結算修復
+// app.js - Project Borahae 視覺特效完全回歸版 (2026.02.14)
+// 包含：YouTube 同步 + 完整特效 (🎤/😱/震動) + 防呆機制
 
 let player;
 let isVideoReady = false;
@@ -8,22 +8,20 @@ let animationFrameId;
 let offset = 0; 
 let lastRenderedText = "";
 
-// [舊版元素回歸] 介面元素抓取
+// 抓取元素
 const startScreen = document.getElementById('start-screen');
 const playScreen = document.getElementById('play-screen');
 const lyricBox = document.getElementById('lyric-box');
 const syncTimer = document.getElementById('sync-timer');
 const btnStart = document.getElementById('btn-start');
 
-/**
- * [區域 A] YouTube API 初始化
- */
+// [區域 A] YouTube API 初始化
 function onYouTubeIframeAPIReady() {
     console.log("Loading YouTube API...");
     player = new YT.Player('player', {
         height: '0',
         width: '0',
-        videoId: 'e95-Gaj2iXM', // BTS - MIC Drop (Audio)
+        videoId: 'e95-Gaj2iXM', 
         playerVars: {
             'autoplay': 0,
             'controls': 0,
@@ -41,45 +39,33 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
-/**
- * [區域 B] 監聽播放狀態 (融合舊版 ENDED 邏輯)
- */
+// [區域 B] 狀態監聽
 function onPlayerStateChange(event) {
-    // 狀態 1: 播放中
     if (event.data === YT.PlayerState.PLAYING) {
         isPlaying = true;
         updateLoop();
-    } 
-    // [舊版元素回歸] 狀態 0: 影片播完 -> 強制跳證書
-    else if (event.data === YT.PlayerState.ENDED) {
+    } else if (event.data === YT.PlayerState.ENDED) {
         isPlaying = false;
         cancelAnimationFrame(animationFrameId);
         showCertificate(); 
-    }
-    else {
+    } else {
         isPlaying = false;
         cancelAnimationFrame(animationFrameId);
     }
 }
 
-/**
- * [區域 C] 啟動邏輯 (融合舊版 btnStart 防呆檢查)
- */
+// [區域 C] 啟動按鈕
 if (btnStart) {
     btnStart.addEventListener('click', () => {
-        // [舊版元素回歸] 防止 API 沒載入好就按
         if (!isVideoReady || !player) {
             alert("影片載入中，請稍候...");
             return;
         }
-
         if (document.documentElement.requestFullscreen) {
             document.documentElement.requestFullscreen().catch(e => console.log(e));
         }
-        
         startScreen.style.display = 'none';
         playScreen.style.display = 'flex';
-        
         player.playVideo();
     });
 }
@@ -89,17 +75,13 @@ function adjustTime(ms) {
     if (navigator.vibrate) navigator.vibrate(20);
 }
 
-/**
- * [區域 D] 核心循環 (融合舊版 songData 檢查 + 0秒 bug 修復)
- */
+// [區域 D] 核心循環
 function updateLoop() {
-    // [舊版元素回歸] 防止 songData 未定義導致報錯
     if (!isPlaying || !player || typeof songData === 'undefined') return; 
     
-    // 取得時間
     let ytTime = player.getCurrentTime() * 1000;
 
-    // [舊版元素回歸] 0秒 bug 修復：如果 YouTube 還沒回傳時間，先不執行
+    // 0秒防呆：避免剛開始撥放時時間跳動異常
     if (ytTime === 0 && isPlaying) {
         animationFrameId = requestAnimationFrame(updateLoop);
         return;
@@ -113,7 +95,7 @@ function updateLoop() {
     }, songData[0]);
 
     if (currentLyric) {
-        // 雙重保險：時間軸到了也觸發
+        // 偵測結束
         if (currentLyric.type === 'end') {
             showCertificate();
             isPlaying = false;
@@ -127,12 +109,13 @@ function updateLoop() {
 }
 
 /**
- * [區域 E] 渲染邏輯 (融合舊版 DOM 存在檢查)
+ * [區域 E] 渲染邏輯 (特效修復重點區) 
+ * 這裡已經完全還原舊版 logic，包含 Sing/Scream 圖示與 CSS 動畫
  */
 function render(lyricObj) {
-    if (!lyricBox) return; // 防止找不到框框報錯
+    if (!lyricBox) return;
 
-    // 1. 警告模式
+    // 1. 警告模式 (紅色閃爍背景)
     if (lyricObj.type === 'warning') {
         document.body.classList.add('warning-mode');
         if (lastRenderedText !== lyricObj.text) {
@@ -145,40 +128,32 @@ function render(lyricObj) {
         document.body.classList.remove('warning-mode');
     }
 
-    // 2. 一般歌詞
+    // 2. 一般歌詞渲染
     if (lastRenderedText !== lyricObj.text) {
         lyricBox.innerText = lyricObj.text;
-        lyricBox.className = ""; 
-        void lyricBox.offsetWidth; // 強制重繪
+        lyricBox.className = ""; // 先清空 Class
+        void lyricBox.offsetWidth; // 強制瀏覽器重繪 (讓動畫可以重播)
         
-        lyricBox.classList.add('active');
+        lyricBox.classList.add('active'); // 基礎彈跳動畫
         
-        // 特效邏輯
+        // --- 這裡就是特效消失的原因，現在加回來了 ---
         if (lyricObj.type === 'chant') {
-            lyricBox.classList.add('type-chant');
+            lyricBox.classList.add('type-chant'); // 紫色發光
             if (navigator.vibrate) navigator.vibrate(50);
         } else if (lyricObj.type === 'sing') {
-            lyricBox.classList.add('type-sing', 'icon-sing');
+            lyricBox.classList.add('type-sing', 'icon-sing'); // 青色 + 麥克風🎤
         } else if (lyricObj.type === 'scream') {
-            lyricBox.classList.add('type-scream', 'icon-scream');
+            lyricBox.classList.add('type-scream', 'icon-scream'); // 紅色 + 驚恐😱 + 劇烈搖晃
             if (navigator.vibrate) navigator.vibrate([50,30,50]);
         } else if (lyricObj.type === 'wave') {
-            lyricBox.classList.add('type-sing', 'icon-wave');
+            lyricBox.classList.add('type-sing', 'icon-wave'); // 手電筒🔦
         }
         
         lastRenderedText = lyricObj.text;
     }
 }
 
-/**
- * [區域 F] 證書與視窗邏輯 (融合舊版獨立函式)
- */
-function showCertificate() {
-    const cert = document.getElementById('beta-cert-overlay');
-    if (cert) cert.style.display = 'flex';
-    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-}
-
+// [區域 F] 輔助功能
 function renderSyncTimer(ms) {
     if (!syncTimer) return;
     let totalSec = Math.floor(Math.max(0, ms) / 1000);
@@ -188,7 +163,12 @@ function renderSyncTimer(ms) {
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
 
-// 說明視窗 (防呆版)
+function showCertificate() {
+    const cert = document.getElementById('beta-cert-overlay');
+    if (cert) cert.style.display = 'flex';
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+}
+
 const helpModal = document.getElementById('help-modal');
 if (helpModal) {
     helpModal.addEventListener('click', (e) => {
@@ -204,7 +184,6 @@ function closeCertificate() {
     const cert = document.getElementById('beta-cert-overlay');
     if (cert) cert.style.display = 'none';
     
-    // 停止 YouTube
     if (player) {
         player.stopVideo();
         player.seekTo(0);
