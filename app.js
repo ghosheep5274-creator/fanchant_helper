@@ -238,11 +238,37 @@ function render(lyricObj) {
     }
 }
 
-// [區域 G] 輔助功能
+// [區域 G] 輔助與結束功能 - finishGame (新增次數累計功能)
 function finishGame() {
     isPlaying = false;
     cancelAnimationFrame(animationFrameId);
     if (useYoutubeMode && player) player.pauseVideo();
+    
+    // --- 🆕 新增：特訓次數累計邏輯 ---
+    // 1. 從瀏覽器記憶取出目前的次數 (預設為 0)
+    let count = parseInt(localStorage.getItem('mic_drop_count') || '0');
+    
+    // 2. 加 1
+    count++;
+    
+    // 3. 存回去
+    localStorage.setItem('mic_drop_count', count);
+    
+    // 4. 顯示進度提示 (利用現有的 toast)
+    const toast = document.querySelector('.toast'); // 抓取現有的提示框
+    if (toast) {
+        if (count < 3) {
+            toast.innerText = `🔥 特訓進度: ${count}/3 (加油!)`;
+        } else {
+            toast.innerText = `🏆 恭喜！已達成 3 次練習目標！`;
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]); // 慶祝震動
+        }
+        
+        toast.classList.add('show');
+        setTimeout(() => { toast.classList.remove('show'); }, 3000); // 顯示久一點 (3秒)
+    }
+    // ---------------------------------
+
     showCertificate();
 }
 
@@ -309,4 +335,5 @@ function closeCertificate() {
     
     if (navigator.vibrate) navigator.vibrate(50);
 }
+
 
