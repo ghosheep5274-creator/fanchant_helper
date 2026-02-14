@@ -53,6 +53,35 @@ if (musicToggle) {
 }
 
 // [區域 C] YouTube API 初始化
+
+// 🆕 自動預載所有歌曲 JSON 的函式
+async function preloadAllLyrics() {
+    console.log("開始預載所有歌曲歌詞...");
+    
+    // 取得 songs.js 裡所有的歌曲 Key (如 mic_drop, dna)
+    const songKeys = Object.keys(songLibrary);
+    
+    // 使用 Promise.all 同時發送所有請求，速度最快
+    await Promise.all(songKeys.map(async (key) => {
+        try {
+            const song = songLibrary[key];
+            const response = await fetch(song.file + '?t=' + Date.now());
+            if (response.ok) {
+                lyricsCache[key] = await response.json();
+                console.log(`✅ ${key} 預載完成`);
+            }
+        } catch (e) {
+            console.error(`❌ ${key} 預載失敗:`, e);
+        }
+    }));
+    
+    console.log("所有歌曲已就緒，現在可以離線使用了！");
+}
+
+// 在頁面載入完成後立即執行預載
+window.addEventListener('load', preloadAllLyrics);
+
+
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '0', width: '0', videoId: 'e95-Gaj2iXM', 
@@ -120,14 +149,22 @@ async function loadSong(songKey) {
         return false;
     }
     currentSongId = songKey;
-    try {
-        const response = await fetch(song.file);
-        if (!response.ok) throw new Error("Fetch failed");
-        currentSongData = await response.json();
-    } catch (e) {
-        alert("歌詞讀取失敗，請確認資料夾中是否有 " + song.file);
-        return false;
+// 🔴 關鍵修改點：優先從快取拿資料
+    if (lyricsCache[songKey]) {
+        currentSongData = lyricsCache[songKey];
+        console.log(`🚀 從記憶體讀取 ${songKey}`);
+    } else {
+        // 如果還沒預載完（例如網路極慢），才進行緊急抓取
+        try {
+            const response = await fetch(song.file + '?t=' + Date.now());
+            currentSongData = await response.json();
+            lyricsCache[songKey] = currentSongData; // 補存入快取
+        } catch (e) {
+            alert("歌詞載入失敗，請確認網路連線");
+            return false;
+        }
     }
+    
     if (player && typeof player.cueVideoById === 'function') {
         player.cueVideoById(song.videoId);
     }
@@ -297,6 +334,7 @@ function renderSyncTimer(ms) {
     let deci = Math.floor((ms % 1000) / 100); 
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
+
 
 
 
