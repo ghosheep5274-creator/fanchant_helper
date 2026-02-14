@@ -423,3 +423,13 @@ input:checked + .slider:before {
     background: rgba(171, 70, 210, 0.3);
 }
 
+/* style.css 最下方加入 */
+
+/* 🧊 讓動畫凍結的魔法 Class */
+.paused-animation {
+    animation-play-state: paused !important;
+    filter: grayscale(80%); /* 加一點巧思：暫停時讓愛心變灰，更有暫停感 */
+    transition: filter 0.3s;
+}
+
+
