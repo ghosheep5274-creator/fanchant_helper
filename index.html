@@ -54,7 +54,7 @@
     </div>
 
     <div id="play-screen" style="display:none;">
-        
+        <button id="btn-home" onclick="returnToHome()">🏠</button>
         <div id="metronome-container">
             <div id="metronome-icon">💜</div>
         </div>
@@ -65,6 +65,7 @@
         
         <div class="controls">
             <button onclick="adjustTime(-100)">⚡️ 字太快</button>
+            <button id="btn-pause" onclick="togglePlay()">⏸ 暫停</button>
             <button onclick="adjustTime(100)">🐢 字太慢</button>
         </div>
         <div id="player-wrapper" style="position: absolute; top: -9999px;">
@@ -117,6 +118,7 @@
 </body>
 
 </html>
+
 
 
 
