@@ -1,5 +1,5 @@
-// app.js - Project Borahae 視覺特效完全回歸版 (2026.02.14)
-// 包含：YouTube 同步 + 完整特效 (🎤/😱/震動) + 防呆機制
+// app.js - Project Borahae 最終完整版 (視覺特效回歸 + YouTube 同步)
+// 特性：保留所有 CSS 動畫、圖示與震動回饋，並修復同步問題。
 
 let player;
 let isVideoReady = false;
@@ -8,7 +8,7 @@ let animationFrameId;
 let offset = 0; 
 let lastRenderedText = "";
 
-// 抓取元素
+// [介面元素抓取]
 const startScreen = document.getElementById('start-screen');
 const playScreen = document.getElementById('play-screen');
 const lyricBox = document.getElementById('lyric-box');
@@ -54,18 +54,21 @@ function onPlayerStateChange(event) {
     }
 }
 
-// [區域 C] 啟動按鈕
+// [區域 C] 啟動邏輯 (防呆檢查)
 if (btnStart) {
     btnStart.addEventListener('click', () => {
         if (!isVideoReady || !player) {
             alert("影片載入中，請稍候...");
             return;
         }
+
         if (document.documentElement.requestFullscreen) {
             document.documentElement.requestFullscreen().catch(e => console.log(e));
         }
+        
         startScreen.style.display = 'none';
         playScreen.style.display = 'flex';
+        
         player.playVideo();
     });
 }
@@ -77,11 +80,12 @@ function adjustTime(ms) {
 
 // [區域 D] 核心循環
 function updateLoop() {
+    // 檢查 songData 是否存在
     if (!isPlaying || !player || typeof songData === 'undefined') return; 
     
     let ytTime = player.getCurrentTime() * 1000;
 
-    // 0秒防呆：避免剛開始撥放時時間跳動異常
+    // 0秒防呆
     if (ytTime === 0 && isPlaying) {
         animationFrameId = requestAnimationFrame(updateLoop);
         return;
@@ -95,7 +99,6 @@ function updateLoop() {
     }, songData[0]);
 
     if (currentLyric) {
-        // 偵測結束
         if (currentLyric.type === 'end') {
             showCertificate();
             isPlaying = false;
@@ -109,13 +112,13 @@ function updateLoop() {
 }
 
 /**
- * [區域 E] 渲染邏輯 (特效修復重點區) 
- * 這裡已經完全還原舊版 logic，包含 Sing/Scream 圖示與 CSS 動畫
+ * [區域 E] 渲染邏輯 (嚴格還原舊版特效)
+ * 這裡恢復了你原始代碼中對 type-sing, icon-sing, icon-scream 的完整判斷
  */
 function render(lyricObj) {
     if (!lyricBox) return;
 
-    // 1. 警告模式 (紅色閃爍背景)
+    // 1. 警告模式
     if (lyricObj.type === 'warning') {
         document.body.classList.add('warning-mode');
         if (lastRenderedText !== lyricObj.text) {
@@ -128,25 +131,29 @@ function render(lyricObj) {
         document.body.classList.remove('warning-mode');
     }
 
-    // 2. 一般歌詞渲染
+    // 2. 一般歌詞 (特效回歸重點)
     if (lastRenderedText !== lyricObj.text) {
         lyricBox.innerText = lyricObj.text;
-        lyricBox.className = ""; // 先清空 Class
-        void lyricBox.offsetWidth; // 強制瀏覽器重繪 (讓動畫可以重播)
+        lyricBox.className = ""; // 重置所有 Class
+        void lyricBox.offsetWidth; // 強制瀏覽器重繪 (觸發動畫關鍵)
         
-        lyricBox.classList.add('active'); // 基礎彈跳動畫
+        // 基礎彈跳
+        lyricBox.classList.add('active');
         
-        // --- 這裡就是特效消失的原因，現在加回來了 ---
+        // 根據 type 加回原本的視覺特效 Class
         if (lyricObj.type === 'chant') {
-            lyricBox.classList.add('type-chant'); // 紫色發光
+            lyricBox.classList.add('type-chant');
             if (navigator.vibrate) navigator.vibrate(50);
         } else if (lyricObj.type === 'sing') {
-            lyricBox.classList.add('type-sing', 'icon-sing'); // 青色 + 麥克風🎤
+            // 恢復青色字體與麥克風圖示
+            lyricBox.classList.add('type-sing', 'icon-sing');
         } else if (lyricObj.type === 'scream') {
-            lyricBox.classList.add('type-scream', 'icon-scream'); // 紅色 + 驚恐😱 + 劇烈搖晃
+            // 恢復紅色搖晃字體與尖叫圖示
+            lyricBox.classList.add('type-scream', 'icon-scream');
             if (navigator.vibrate) navigator.vibrate([50,30,50]);
         } else if (lyricObj.type === 'wave') {
-            lyricBox.classList.add('type-sing', 'icon-wave'); // 手電筒🔦
+            // 恢復手電筒圖示
+            lyricBox.classList.add('type-sing', 'icon-wave');
         }
         
         lastRenderedText = lyricObj.text;
@@ -169,6 +176,7 @@ function showCertificate() {
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 }
 
+// 說明視窗邏輯
 const helpModal = document.getElementById('help-modal');
 if (helpModal) {
     helpModal.addEventListener('click', (e) => {
@@ -186,7 +194,7 @@ function closeCertificate() {
     
     if (player) {
         player.stopVideo();
-        player.seekTo(0);
+        player.seekTo(0); // 回到開頭
     }
     
     isPlaying = false;
