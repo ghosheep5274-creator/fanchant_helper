@@ -1,0 +1,5 @@
+[
+    { "time": 1000, "text": "Waiting for DNA...", "type": "wait" },
+    { "time": 5000, "text": "김.남.준!", "type": "chant" },
+    { "time": 245000, "text": "", "type": "end" }
+]
