@@ -1,5 +1,5 @@
-// app.js - Project Borahae 雙核心究極版 (2026.02.14)
-// 特性：支援「線上影音模式」與「離線純文字模式」切換 + 完整特效
+// app.js - 最終人性化版 (回首頁 + 暫停功能)
+// 特性：雙核心模式 + 完整暫停邏輯 + 強制回首頁
 
 let player;
 let isVideoReady = false;
@@ -8,9 +8,10 @@ let animationFrameId;
 let offset = 0; 
 let lastRenderedText = "";
 
-// 🆕 新增變數：離線模式專用的起始時間與模式標記
+// 時間控制變數
 let startTime = 0; 
 let useYoutubeMode = true; 
+let pauseStartTime = 0; // 紀錄暫停當下的時間
 
 // [介面元素抓取]
 const startScreen = document.getElementById('start-screen');
@@ -18,10 +19,11 @@ const playScreen = document.getElementById('play-screen');
 const lyricBox = document.getElementById('lyric-box');
 const syncTimer = document.getElementById('sync-timer');
 const btnStart = document.getElementById('btn-start');
-const musicToggle = document.getElementById('music-toggle'); // 抓取開關
+const musicToggle = document.getElementById('music-toggle'); 
 const modeText = document.getElementById('mode-text');
+const btnPause = document.getElementById('btn-pause'); // 抓暫停鈕
 
-// [區域 A] 切換開關監聽 (UI互動)
+// [區域 A] 切換開關監聽
 if (musicToggle) {
     musicToggle.addEventListener('change', (e) => {
         useYoutubeMode = e.target.checked;
@@ -37,24 +39,18 @@ if (musicToggle) {
 
 // [區域 B] YouTube API 初始化
 function onYouTubeIframeAPIReady() {
-    console.log("Loading YouTube API...");
     player = new YT.Player('player', {
-        height: '0',
-        width: '0',
-        videoId: 'e95-Gaj2iXM', 
-        playerVars: {
-            'autoplay': 0, 'controls': 0, 'disablekb': 1, 'playsinline': 1, 'rel': 0
-        },
+        height: '0', width: '0', videoId: 'e95-Gaj2iXM', 
+        playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1, 'playsinline': 1, 'rel': 0 },
         events: {
-            'onReady': () => { isVideoReady = true; console.log("YouTube Player Ready!"); },
+            'onReady': () => { isVideoReady = true; console.log("YouTube Ready"); },
             'onStateChange': onPlayerStateChange
         }
     });
 }
 
-// [區域 C] 狀態監聽
+// [區域 C] 狀態監聽 (整合暫停狀態 UI)
 function onPlayerStateChange(event) {
-    // 防偷跑：如果在首頁，禁止播放
     if (startScreen && startScreen.style.display !== 'none') {
         if (event.data === YT.PlayerState.PLAYING) player.stopVideo();
         return;
@@ -63,36 +59,34 @@ function onPlayerStateChange(event) {
     if (useYoutubeMode) {
         if (event.data === YT.PlayerState.PLAYING) {
             isPlaying = true;
+            updatePauseButton(true); // 變為 "暫停"
             updateLoop();
+        } else if (event.data === YT.PlayerState.PAUSED) {
+            isPlaying = false;
+            updatePauseButton(false); // 變為 "播放"
+            cancelAnimationFrame(animationFrameId);
         } else if (event.data === YT.PlayerState.ENDED) {
             finishGame();
-        } else {
-            isPlaying = false;
-            cancelAnimationFrame(animationFrameId);
         }
     }
 }
 
-// [區域 D] 啟動邏輯 (雙核心分流)
+// [區域 D] 啟動與暫停邏輯
 if (btnStart) {
     btnStart.addEventListener('click', () => {
-        
-        // 核心分支 1: 音樂模式 (檢查 YouTube)
         if (useYoutubeMode) {
             if (!isVideoReady || !player) {
-                alert("YouTube 載入中... 若無網路請切換至「離線模式」");
+                alert("YouTube 載入中...");
                 return;
             }
             enterPlayScreen();
-            player.playVideo(); // 讓 YouTube 驅動 updateLoop
-        } 
-        
-        // 核心分支 2: 離線模式 (使用系統時鐘)
-        else {
+            player.playVideo();
+        } else {
             enterPlayScreen();
-            startTime = Date.now(); // 紀錄現在時間
+            startTime = Date.now(); 
             isPlaying = true;
-            updateLoop(); // 手動啟動循環
+            updatePauseButton(true);
+            updateLoop();
         }
     });
 }
@@ -105,36 +99,71 @@ function enterPlayScreen() {
     playScreen.style.display = 'flex';
 }
 
-// [區域 E] 核心循環 (雙引擎)
+// 🆕 暫停/播放 切換功能
+window.togglePlay = function() {
+    if (isPlaying) {
+        // 執行暫停
+        isPlaying = false;
+        updatePauseButton(false);
+        cancelAnimationFrame(animationFrameId);
+        
+        if (useYoutubeMode && player) {
+            player.pauseVideo();
+        } else {
+            // 離線模式：紀錄暫停開始的時間點
+            pauseStartTime = Date.now();
+        }
+    } else {
+        // 執行播放
+        isPlaying = true;
+        updatePauseButton(true);
+        
+        if (useYoutubeMode && player) {
+            player.playVideo();
+        } else {
+            // 離線模式：把「休息了多久」加回到 startTime，讓時間接續
+            const pausedDuration = Date.now() - pauseStartTime;
+            startTime += pausedDuration;
+            updateLoop();
+        }
+    }
+};
+
+// 🆕 回首頁功能 (暴力重置所有狀態)
+window.returnToHome = function() {
+    if (confirm("確定要中斷應援並回到首頁嗎？")) {
+        closeCertificate(); // 借用這個函式的重置邏輯
+    }
+};
+
+function updatePauseButton(isPlaying) {
+    if (btnPause) {
+        btnPause.innerText = isPlaying ? "⏸ 暫停" : "▶️ 繼續";
+        btnPause.style.background = isPlaying ? "rgba(171, 70, 210, 0.3)" : "#AB46D2";
+    }
+}
+
+// [區域 E] 核心循環
 function updateLoop() {
     if (!isPlaying) return;
-    
-    // 防止資料未載入
     if (typeof songData === 'undefined') return;
 
     let currentMs = 0;
 
-    // --- 🕒 時間獲取邏輯分流 ---
     if (useYoutubeMode) {
-        // 引擎 A: 依賴 YouTube 進度
         if (!player || typeof player.getCurrentTime !== 'function') return;
         currentMs = player.getCurrentTime() * 1000;
-        
-        // 0秒防呆 (YouTube 剛載入時會回傳 0)
         if (currentMs === 0) {
             animationFrameId = requestAnimationFrame(updateLoop);
             return;
         }
     } else {
-        // 引擎 B: 依賴系統時間 (離線)
         currentMs = Date.now() - startTime;
     }
 
-    // 計算最終時間 (加上手動微調)
     const currentTime = currentMs + offset; 
     renderSyncTimer(currentTime);
 
-    // 比對歌詞
     const currentLyric = songData.reduce((prev, curr) => {
         return (curr.time <= currentTime) ? curr : prev;
     }, songData[0]);
@@ -150,11 +179,10 @@ function updateLoop() {
     animationFrameId = requestAnimationFrame(updateLoop);
 }
 
-// [區域 F] 渲染邏輯 (特效保留)
+// [區域 F] 渲染邏輯
 function render(lyricObj) {
     if (!lyricBox) return;
 
-    // 警告模式
     if (lyricObj.type === 'warning') {
         document.body.classList.add('warning-mode');
         if (lastRenderedText !== lyricObj.text) {
@@ -167,12 +195,10 @@ function render(lyricObj) {
         document.body.classList.remove('warning-mode');
     }
 
-    // 一般歌詞
     if (lastRenderedText !== lyricObj.text) {
         lyricBox.innerText = lyricObj.text;
         lyricBox.className = ""; 
         void lyricBox.offsetWidth; 
-        
         lyricBox.classList.add('active');
         
         if (lyricObj.type === 'chant') {
@@ -191,7 +217,7 @@ function render(lyricObj) {
     }
 }
 
-// [區域 G] 輔助與結束功能
+// [區域 G] 輔助功能
 function finishGame() {
     isPlaying = false;
     cancelAnimationFrame(animationFrameId);
@@ -207,11 +233,9 @@ function renderSyncTimer(ms) {
     let min = Math.floor(totalSec / 60);
     let sec = totalSec % 60;
     let deci = Math.floor((ms % 1000) / 100); 
-    
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
 
-// 動態建立提示框元件
 const toast = document.createElement('div');
 toast.className = 'toast';
 document.body.appendChild(toast);
@@ -220,7 +244,6 @@ let toastTimeout;
 window.adjustTime = function(ms) {
     offset += ms;
     if (navigator.vibrate) navigator.vibrate(20);
-    
     const sign = offset > 0 ? '+' : '';
     toast.innerText = `校正: ${sign}${offset}ms`;
     toast.classList.add('show');
@@ -248,12 +271,10 @@ function toggleHelp(show) {
 function closeCertificate() {
     const cert = document.getElementById('beta-cert-overlay');
     if (cert) cert.style.display = 'none';
-    
-    // 切換回首頁
+
     if (playScreen) playScreen.style.display = 'none';
     if (startScreen) startScreen.style.display = 'flex';
 
-    // 停止影片 (如果有的話)
     if (player && typeof player.stopVideo === 'function') {
         player.stopVideo(); 
     }
@@ -263,6 +284,7 @@ function closeCertificate() {
     startTime = 0;
     lastRenderedText = ""; 
     cancelAnimationFrame(animationFrameId);
+    updatePauseButton(false); // 重置按鈕狀態
     
     if (navigator.vibrate) navigator.vibrate(50);
 }
