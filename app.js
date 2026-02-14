@@ -118,8 +118,17 @@ async function loadSong(songKey) {
 
     currentSongId = songKey;
 
-    // 先啟動歌詞 Fetch (非同步並行)
-    const fetchPromise = fetch(song.file).then(res => res.json());
+   try {
+        // 🔴 在檔案路徑後面加上 ?t=時間戳記，強制瀏覽器抓取最新 JSON
+        const response = await fetch(song.file + '?t=' + Date.now()); 
+        
+        if (!response.ok) throw new Error("Fetch failed");
+        currentSongData = await response.json();
+        console.log(`Loaded latest lyrics for ${songKey}`);
+    } catch (e) {
+        alert("歌詞讀取失敗");
+        return false;
+    }
 
     // 處理 YouTube：如果 ID 沒變，就不需要 loadVideoById
     if (player && isVideoReady) {
@@ -302,4 +311,5 @@ function renderSyncTimer(ms) {
     let deci = Math.floor((ms % 1000) / 100); 
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
+
 
