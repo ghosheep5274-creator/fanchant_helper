@@ -25,10 +25,31 @@ const modeText = document.getElementById('mode-text');
 const btnPause = document.getElementById('btn-pause');
 const songSelect = document.getElementById('song-select');
 
-// [區域 B] 模式切換監聽
+// [區域 B] 模式切換監聽 - 修正即時同步版
 if (musicToggle) {
     musicToggle.addEventListener('change', (e) => {
+        // 1. 在切換前，先記下「這一瞬間」播到幾毫秒了
+        let currentProgress = useYoutubeMode ? 
+            (player.getCurrentTime() * 1000) : 
+            (Date.now() - startTime);
+
         useYoutubeMode = e.target.checked;
+
+        // 2. 關鍵同步邏輯
+        if (useYoutubeMode) {
+            // 轉為音樂模式：叫 YouTube 飛到剛剛的位置
+            if (player && isVideoReady) {
+                player.seekTo(currentProgress / 1000);
+                if (isPlaying) player.playVideo(); // 如果正在練，音樂也跟著開
+            }
+        } else {
+            // 轉為離線模式：校準虛擬起點 (startTime)
+            // 讓 (Date.now() - startTime)剛好等於剛才的進度
+            startTime = Date.now() - currentProgress;
+            if (player) player.pauseVideo(); // 離線模式就讓音樂閉嘴
+        }
+
+        // 3. UI 顯示更新
         modeText.innerText = useYoutubeMode ? "🎵 音樂模式 (需網路)" : "🔕 離線模式 (純文字)";
         modeText.style.color = useYoutubeMode ? "#AB46D2" : "#aaa";
     });
@@ -279,5 +300,6 @@ function renderSyncTimer(ms) {
     let deci = Math.floor((ms % 1000) / 100); 
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
+
 
 
