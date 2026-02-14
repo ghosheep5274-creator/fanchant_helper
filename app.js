@@ -70,8 +70,6 @@ function onPlayerStateChange(event) {
 if (btnStart) {
     btnStart.addEventListener('click', async () => {
         const selectedValue = songSelect ? songSelect.value : "mic_drop";
-        
-        // 等待 JSON 載入
         const loaded = await loadSong(selectedValue);
         if (!loaded) return;
 
@@ -81,8 +79,13 @@ if (btnStart) {
                 return;
             }
             enterPlayScreen();
-            player.playVideo();
+            player.playVideo(); // 音樂模式才執行播放
         } else {
+            // 🔴 離線模式保險：確保 YouTube 停止播放
+            if (player && typeof player.stopVideo === 'function') {
+                player.stopVideo();
+            }
+            
             enterPlayScreen();
             startTime = Date.now(); 
             isPlaying = true;
@@ -276,4 +279,5 @@ function renderSyncTimer(ms) {
     let deci = Math.floor((ms % 1000) / 100); 
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
+
 
