@@ -107,8 +107,8 @@ async function loadSong(songKey) {
         alert("歌詞讀取失敗，請確認資料夾中是否有 " + song.file);
         return false;
     }
-    if (player && typeof player.loadVideoById === 'function') {
-        player.loadVideoById(song.videoId);
+    if (player && typeof player.cueVideoById === 'function') {
+        player.cueVideoById(song.videoId);
     }
     const heart = document.getElementById('metronome-icon');
     if (heart && song.bpm) {
@@ -276,3 +276,4 @@ function renderSyncTimer(ms) {
     let deci = Math.floor((ms % 1000) / 100); 
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
+
