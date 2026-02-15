@@ -436,7 +436,7 @@ function startSakura() {
     console.log("🌸 櫻花季開始");
     
     // 每 300毫秒 產生一片花瓣 (數字越小花越密)
-    sakuraInterval = setInterval(createPetal, 300);
+    sakuraInterval = setInterval(createPetal, 600);
 }
 
 // 停止櫻花 (停止生成，舊的讓它飄完)
@@ -483,6 +483,7 @@ function createPetal() {
         petal.remove();
     }, parseFloat(duration) * 1000);
 }
+
 
 
 
