@@ -297,32 +297,49 @@ window.toggleHelp = function(show) {
 };
 
 function finishGame() {
+    console.log("Game Finished"); // Debug
+
+    // 1. 停止播放狀態
     isPlaying = false;
     cancelAnimationFrame(animationFrameId);
-    if (useYoutubeMode && player) player.pauseVideo();
+    
+    // 2. 停止影片 (如果是在 YouTube 模式)
+    if (useYoutubeMode && player && typeof player.stopVideo === 'function') {
+        player.stopVideo();
+    }
+
+    // 3. 累計次數 (這是給 Training 頁面判定進度用的)
     const key = `${currentSongId}_count`;
     let count = parseInt(localStorage.getItem(key) || '0') + 1;
     localStorage.setItem(key, count);
-    showCertificate();
+    console.log(`Song ${currentSongId} count: ${count}`);
+
+    // 4. 不跳證書，直接休息一下後返回首頁
+    // 設定 1 秒緩衝，讓使用者意識到歌曲結束，不要太突然切掉
+    setTimeout(() => {
+        resetToTitle(); 
+    }, 1000); 
 }
 
-function showCertificate() {
-    const cert = document.getElementById('beta-cert-overlay');
-    if (cert) cert.style.display = 'flex';
-    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-}
-
-function closeCertificate() {
+// 🆕 新函式：重置並返回標題畫面 (取代原本的 closeCertificate)
+function resetToTitle() {
+    // 切換介面
     if (playScreen) playScreen.style.display = 'none';
     if (startScreen) startScreen.style.display = 'flex';
-    const cert = document.getElementById('beta-cert-overlay');
-    if (cert) cert.style.display = 'none';
-    if (player && typeof player.stopVideo === 'function') player.stopVideo();
+    
+    // 重置所有變數
     isPlaying = false;
     offset = 0;
     startTime = 0;
     lastRenderedText = ""; 
     cancelAnimationFrame(animationFrameId);
+    
+    // 再次確保影片停止 (防呆)
+    if (player && typeof player.stopVideo === 'function') {
+        player.stopVideo();
+    }
+    
+    // 重置暫停按鈕外觀
     updatePauseButton(false);
 }
 
@@ -334,6 +351,7 @@ function renderSyncTimer(ms) {
     let deci = Math.floor((ms % 1000) / 100); 
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
+
 
 
 
