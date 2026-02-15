@@ -1,6 +1,7 @@
-// app.js - Project Borahae 多歌曲非同步完整版 (2026.02.15)
+// app.js - Project Borahae 最終整合版 (2026.02.15)
+// 包含：自動選單生成、歌詞預載、雙模式切換、防呆機制
 
-let lyricsCache = {}; // 🆕 用來存放所有下載好的歌詞 JSON
+let lyricsCache = {}; // 存放預載歌詞
 let player;
 let isVideoReady = false;
 let isPlaying = false;
@@ -9,11 +10,11 @@ let offset = 0;
 let lastRenderedText = "";
 
 let startTime = 0; 
-let useYoutubeMode = false; // 🔴 改為 false
+let useYoutubeMode = false; 
 let pauseStartTime = 0;
 
 let currentSongData = []; 
-let currentSongId = "mic_drop"; 
+let currentSongId = "mic_drop"; // 預設值
 
 // [區域 A] 介面元素抓取
 const startScreen = document.getElementById('start-screen');
@@ -26,61 +27,40 @@ const modeText = document.getElementById('mode-text');
 const btnPause = document.getElementById('btn-pause');
 const songSelect = document.getElementById('song-select');
 
-// [區域 B] 模式切換監聽 - 安全防呆版
-if (musicToggle) {
-    musicToggle.addEventListener('change', (e) => {
-        // 1. 安全獲取當前進度
-        let currentProgress = 0;
-        
-        if (useYoutubeMode) {
-            // 如果原本是 YouTube 模式，嘗試抓取播放器時間
-            // 🛑 防呆：確認 player 真的存在且有 getCurrentTime 方法
-            if (player && typeof player.getCurrentTime === 'function') {
-                currentProgress = player.getCurrentTime() * 1000;
-            } else {
-                // 如果 player 壞掉或沒準備好，改用系統時間推算 (Fallback)
-                currentProgress = Date.now() - startTime - offset;
-            }
-        } else {
-            // 如果原本是離線模式，直接用系統時間
-            currentProgress = Date.now() - startTime;
-        }
+// [區域 B] 初始化邏輯 (自動選單 & 預載)
 
-        // 2. 切換模式變數
-        useYoutubeMode = e.target.checked; 
+// 1. 自動渲染歌曲選單
+function renderSongSelect() {
+    if (!songSelect || typeof songLibrary === 'undefined') return;
 
-        // 3. 更新 UI 文字
-        if (modeText) {
-            modeText.innerText = "🎵 音樂模式";
-            modeText.style.color = useYoutubeMode ? "#AB46D2" : "#888"; // 紫色 vs 灰色
-        }
+    songSelect.innerHTML = ""; // 清空
 
-        // 4. 重置起始時間 (將剛才算出的 currentProgress 帶入新的基準)
-        if (useYoutubeMode) {
-            // 切換到 Online: 嘗試 seek 到對應秒數
-            if (player && typeof player.seekTo === 'function') {
-                player.seekTo(currentProgress / 1000, true);
-                if (isPlaying) player.playVideo();
-            }
-        } else {
-            // 切換到 Offline: 重設 Date.now() 基準點
-            startTime = Date.now() - currentProgress;
-        }
-        
-        console.log(`Mode switched. New mode: ${useYoutubeMode ? 'Online' : 'Offline'}, Progress: ${currentProgress}ms`);
+    // 產生選項
+    Object.entries(songLibrary).forEach(([id, data]) => {
+        const option = document.createElement('option');
+        option.value = id;
+        option.innerText = data.title;
+        songSelect.appendChild(option);
     });
+
+    // 讀取上次選擇
+    const lastPicked = localStorage.getItem('last_picked_song');
+    if (lastPicked && songLibrary[lastPicked]) {
+        songSelect.value = lastPicked;
+        currentSongId = lastPicked;
+    } else {
+        // 如果沒有紀錄，就用選單的第一個
+        currentSongId = songSelect.value;
+    }
+    console.log("選單初始化完成，目前選擇:", currentSongId);
 }
 
-// [區域 C] YouTube API 初始化
-
-// 🆕 自動預載所有歌曲 JSON 的函式
+// 2. 自動預載所有歌詞
 async function preloadAllLyrics() {
     console.log("開始預載所有歌曲歌詞...");
-    
-    // 取得 songs.js 裡所有的歌曲 Key (如 mic_drop, dna)
+    if (typeof songLibrary === 'undefined') return;
+
     const songKeys = Object.keys(songLibrary);
-    
-    // 使用 Promise.all 同時發送所有請求，速度最快
     await Promise.all(songKeys.map(async (key) => {
         try {
             const song = songLibrary[key];
@@ -93,14 +73,62 @@ async function preloadAllLyrics() {
             console.error(`❌ ${key} 預載失敗:`, e);
         }
     }));
-    
-    console.log("所有歌曲已就緒，現在可以離線使用了！");
+    console.log("歌詞預載作業結束。");
 }
 
-// 在頁面載入完成後立即執行預載
-window.addEventListener('load', preloadAllLyrics);
+// 頁面載入時執行初始化
+window.addEventListener('DOMContentLoaded', () => {
+    renderSongSelect();
+    preloadAllLyrics();
+});
 
+// 監聽選單改變
+if (songSelect) {
+    songSelect.addEventListener('change', (e) => {
+        currentSongId = e.target.value;
+        localStorage.setItem('last_picked_song', currentSongId);
+        console.log("切換歌曲至:", currentSongId);
+    });
+}
 
+// [區域 C] 模式切換邏輯
+if (musicToggle) {
+    musicToggle.addEventListener('change', (e) => {
+        let currentProgress = 0;
+        
+        // 1. 計算當前進度
+        if (useYoutubeMode) {
+            if (player && typeof player.getCurrentTime === 'function') {
+                currentProgress = player.getCurrentTime() * 1000;
+            } else {
+                currentProgress = Date.now() - startTime - offset;
+            }
+        } else {
+            currentProgress = Date.now() - startTime;
+        }
+
+        // 2. 切換狀態
+        useYoutubeMode = e.target.checked; 
+
+        // 3. 更新 UI
+        if (modeText) {
+            modeText.innerText = "🎵 音樂模式";
+            modeText.style.color = useYoutubeMode ? "#AB46D2" : "#888"; 
+        }
+
+        // 4. 重置時間基準
+        if (useYoutubeMode) {
+            if (player && typeof player.seekTo === 'function') {
+                player.seekTo(currentProgress / 1000, true);
+                if (isPlaying) player.playVideo();
+            }
+        } else {
+            startTime = Date.now() - currentProgress;
+        }
+    });
+}
+
+// [區域 D] YouTube API
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '0', width: '0', videoId: 'e95-Gaj2iXM', 
@@ -113,10 +141,12 @@ function onYouTubeIframeAPIReady() {
 }
 
 function onPlayerStateChange(event) {
+    // 如果還在首頁就偷跑，強制停止
     if (startScreen && startScreen.style.display !== 'none') {
         if (event.data === YT.PlayerState.PLAYING) player.stopVideo();
         return;
     }
+    
     if (useYoutubeMode) {
         if (event.data === YT.PlayerState.PLAYING) {
             isPlaying = true;
@@ -132,26 +162,23 @@ function onPlayerStateChange(event) {
     }
 }
 
-// [區域 D] 啟動與非同步載入
+// [區域 E] 遊戲啟動 (Start Game)
 if (btnStart) {
     btnStart.addEventListener('click', async () => {
-        const selectedValue = songSelect ? songSelect.value : "mic_drop";
-        const loaded = await loadSong(selectedValue);
+        // 確保 currentSongId 有值
+        const targetSong = songSelect ? songSelect.value : currentSongId;
+        const loaded = await loadSong(targetSong);
         if (!loaded) return;
 
         if (useYoutubeMode) {
             if (!isVideoReady || !player) {
-                alert("YouTube 載入中...");
+                alert("YouTube 載入中，請稍後再試...");
                 return;
             }
             enterPlayScreen();
-            player.playVideo(); // 音樂模式才執行播放
+            player.playVideo();
         } else {
-            // 🔴 離線模式保險：確保 YouTube 停止播放
-            if (player && typeof player.stopVideo === 'function') {
-                player.stopVideo();
-            }
-            
+            if (player && typeof player.stopVideo === 'function') player.stopVideo();
             enterPlayScreen();
             startTime = Date.now(); 
             isPlaying = true;
@@ -168,30 +195,32 @@ async function loadSong(songKey) {
         return false;
     }
     currentSongId = songKey;
-// 🔴 關鍵修改點：優先從快取拿資料
+    
+    // 優先從快取讀取
     if (lyricsCache[songKey]) {
         currentSongData = lyricsCache[songKey];
         console.log(`🚀 從記憶體讀取 ${songKey}`);
     } else {
-        // 如果還沒預載完（例如網路極慢），才進行緊急抓取
         try {
             const response = await fetch(song.file + '?t=' + Date.now());
             currentSongData = await response.json();
-            lyricsCache[songKey] = currentSongData; // 補存入快取
+            lyricsCache[songKey] = currentSongData;
         } catch (e) {
-            alert("歌詞載入失敗，請確認網路連線");
+            alert("歌詞載入失敗，請檢查網路。");
             return false;
         }
     }
     
+    // 設定 YouTube 影片
     if (player && typeof player.cueVideoById === 'function') {
         player.cueVideoById(song.videoId);
     }
+    
+    // 設定心跳 BPM
     const heart = document.getElementById('metronome-icon');
     if (heart && song.bpm) {
         const duration = (60 / song.bpm) + "s";
         heart.style.animationDuration = duration;
-        console.log(`BPM set to ${song.bpm}, duration: ${duration}`);
     }
     return true;
 }
@@ -204,29 +233,38 @@ function enterPlayScreen() {
     playScreen.style.display = 'flex';
 }
 
-// [區域 E] 核心循環
+// [區域 F] 核心循環 (Game Loop)
 function updateLoop() {
     if (!isPlaying) return;
+    
     let currentMs = useYoutubeMode ? (player.getCurrentTime() * 1000) : (Date.now() - startTime);
+    
+    // YouTube 有時候剛開始會回傳 0，若是 0 則繼續跑 loop 等待
     if (useYoutubeMode && currentMs === 0) {
         animationFrameId = requestAnimationFrame(updateLoop);
         return;
     }
+    
     const currentTime = currentMs + offset; 
     renderSyncTimer(currentTime);
+    
     const currentLyric = currentSongData.reduce((prev, curr) => {
         return (curr.time <= currentTime) ? curr : prev;
     }, currentSongData[0]);
+    
     if (currentLyric) {
         if (currentLyric.type === 'end') { finishGame(); return; }
         render(currentLyric);
     }
+    
     animationFrameId = requestAnimationFrame(updateLoop);
 }
 
-// [區域 F] 渲染與特效
+// [區域 G] 渲染 (Render)
 function render(lyricObj) {
     if (!lyricBox) return;
+    
+    // 處理特殊 Type 樣式
     if (lyricObj.type === 'warning') {
         document.body.classList.add('warning-mode');
         if (lastRenderedText !== lyricObj.text) {
@@ -238,11 +276,14 @@ function render(lyricObj) {
     } else {
         document.body.classList.remove('warning-mode');
     }
+
     if (lastRenderedText !== lyricObj.text) {
         lyricBox.innerText = lyricObj.text;
         lyricBox.className = ""; 
-        void lyricBox.offsetWidth; 
+        void lyricBox.offsetWidth; // 觸發重繪 (Reflow) 以重啟動畫
         lyricBox.classList.add('active');
+        
+        // 根據 Type 加 class
         if (lyricObj.type === 'chant') {
             lyricBox.classList.add('type-chant');
             if (navigator.vibrate) navigator.vibrate(50);
@@ -254,12 +295,14 @@ function render(lyricObj) {
         } else if (lyricObj.type === 'wave') {
             lyricBox.classList.add('type-sing', 'icon-wave');
         }
+        
         lastRenderedText = lyricObj.text;
     }
 }
 
-// [區域 G] UI 互動函式 (綁定至 window 以修復 ReferenceError)
+// [區域 H] 控制與輔助函式
 
+// 暫停/繼續
 window.togglePlay = function() {
     if (isPlaying) {
         isPlaying = false;
@@ -275,12 +318,14 @@ window.togglePlay = function() {
     }
 };
 
+// 返回首頁
 window.returnToHome = function() {
     if (confirm("確定要回到首頁嗎？目前的練習將不會計次。")) {
         resetToTitle();
     }
 };
 
+// 更新暫停按鈕外觀
 function updatePauseButton(active) {
     if (btnPause) {
         btnPause.innerText = active ? "⏸ 暫停" : "▶️ 繼續";
@@ -294,6 +339,7 @@ function updatePauseButton(active) {
     }
 }
 
+// 微調時間
 window.adjustTime = function(ms) {
     offset += ms;
     if (navigator.vibrate) navigator.vibrate(20);
@@ -310,58 +356,53 @@ function createToast() {
     return t;
 }
 
+// 顯示/隱藏說明
 window.toggleHelp = function(show) {
     const modal = document.getElementById('help-modal');
     if (modal) modal.style.display = show ? 'flex' : 'none';
 };
 
+// 遊戲結束邏輯
 function finishGame() {
-    console.log("Game Finished"); // Debug
-
-    // 1. 停止播放狀態
+    console.log("Game Finished"); 
     isPlaying = false;
     cancelAnimationFrame(animationFrameId);
     
-    // 2. 停止影片 (如果是在 YouTube 模式)
     if (useYoutubeMode && player && typeof player.stopVideo === 'function') {
         player.stopVideo();
     }
 
-    // 3. 累計次數 (這是給 Training 頁面判定進度用的)
+    // 增加計數
     const key = `${currentSongId}_count`;
     let count = parseInt(localStorage.getItem(key) || '0') + 1;
     localStorage.setItem(key, count);
     console.log(`Song ${currentSongId} count: ${count}`);
 
-    // 4. 不跳證書，直接休息一下後返回首頁
-    // 設定 1.8 秒緩衝，讓使用者意識到歌曲結束，不要太突然切掉
+    // 延遲後回首頁
     setTimeout(() => {
         resetToTitle(); 
     }, 1800); 
 }
 
-// 🆕 新函式：重置並返回標題畫面 (取代原本的 closeCertificate)
+// 重置回首頁
 function resetToTitle() {
-    // 切換介面
     if (playScreen) playScreen.style.display = 'none';
     if (startScreen) startScreen.style.display = 'flex';
     
-    // 重置所有變數
     isPlaying = false;
     offset = 0;
     startTime = 0;
     lastRenderedText = ""; 
     cancelAnimationFrame(animationFrameId);
     
-    // 再次確保影片停止 (防呆)
     if (player && typeof player.stopVideo === 'function') {
         player.stopVideo();
     }
     
-    // 重置暫停按鈕外觀
     updatePauseButton(false);
 }
 
+// 渲染計時器
 function renderSyncTimer(ms) {
     if (!syncTimer) return;
     let totalSec = Math.floor(Math.max(0, ms) / 1000);
@@ -370,15 +411,3 @@ function renderSyncTimer(ms) {
     let deci = Math.floor((ms % 1000) / 100); 
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
-
-
-
-
-
-
-
-
-
-
-
-
