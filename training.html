@@ -4,125 +4,217 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ARMY Training Camp</title>
-    <script src="songs.js"></script>
     <style>
-        body { background: #111; color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
-        h1 { color: #AB46D2; }
-        #progress-container { width: 100%; background: #333; height: 20px; border-radius: 10px; margin: 20px 0; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: #AB46D2; transition: width 0.3s; }
-        .song-list { text-align: left; max-width: 400px; margin: 0 auto; }
-        .song-item { padding: 12px; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
-        .song-info { display: flex; align-items: center; }
-        .song-item input { margin-right: 15px; transform: scale(1.5); accent-color: #AB46D2; }
-        .song-item input:disabled { opacity: 0.6; cursor: not-allowed; }
-        .count-tag { font-size: 12px; color: #AB46D2; font-weight: bold; }
+        /* 全域設定 */
+        body { background: #000; color: #fff; font-family: 'Arial', sans-serif; padding: 20px; text-align: center; }
+        h1 { color: #AB46D2; text-shadow: 0 0 10px #AB46D2; }
+        a { color: #888; text-decoration: none; transition: color 0.3s; }
+        a:hover { color: #AB46D2; }
+
+        /* 進度條區域 */
+        #army-name { 
+            padding: 12px; border-radius: 5px; border: 2px solid #AB46D2; 
+            background: #222; color: #fff; width: 80%; max-width: 300px;
+            font-size: 16px; text-align: center; outline: none;
+            margin-top: 10px;
+        }
+        #army-name:focus { box-shadow: 0 0 15px rgba(171, 70, 210, 0.5); }
+
+        #progress-container { 
+            width: 100%; max-width: 400px; background: #333; height: 20px; 
+            border-radius: 10px; margin: 20px auto; overflow: hidden; border: 1px solid #555;
+        }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #AB46D2, #7a2c9e); transition: width 0.3s; }
         
-        #btn-cert { background: #444; color: #888; border: none; padding: 15px; border-radius: 50px; width: 100%; margin-top: 20px; font-size: 18px; }
-        #btn-cert.unlocked { background: linear-gradient(45deg, #AB46D2, #5a189a); color: white; cursor: pointer; box-shadow: 0 0 20px #AB46D2; }
-        
-        #certificate-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); flex-direction: column; justify-content: center; align-items: center; z-index: 999; }
-        #cert-card { background: #000; border: 4px solid #AB46D2; padding: 20px; border-radius: 15px; width: 80%; text-align: center; }
-        .close-btn { margin-top: 20px; background: transparent; border: 1px solid #fff; color: white; padding: 5px 20px; border-radius: 20px; }
+        /* 歌曲清單 */
+        .song-list { text-align: left; max-width: 400px; margin: 0 auto; background: #111; border-radius: 10px; padding: 10px; }
+        .song-item { padding: 15px; border-bottom: 1px solid #333; display: flex; align-items: center; font-size: 18px; }
+        .song-item:last-child { border-bottom: none; }
+        .song-item input { margin-right: 15px; transform: scale(1.5); accent-color: #AB46D2; cursor: pointer; }
+
+        /* 領取按鈕 */
+        #btn-cert { 
+            background: #444; color: #888; border: none; padding: 15px; 
+            border-radius: 50px; width: 100%; max-width: 400px; 
+            margin-top: 30px; font-size: 18px; transition: all 0.3s;
+        }
+        #btn-cert.unlocked { 
+            background: linear-gradient(45deg, #AB46D2, #5a189a); 
+            color: white; cursor: pointer; 
+            box-shadow: 0 0 20px #AB46D2; animation: pulse 2s infinite; 
+            font-weight: bold;
+        }
+
+        /* --- 移植過來的證書 CSS --- */
+        #certificate-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: none; /* JS 控制顯示 */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeIn 0.5s ease-out;
+            backdrop-filter: blur(5px);
+        }
+
+        .cert-card {
+            background: #111;
+            border: 2px solid #444;
+            width: 85%;
+            max-width: 350px;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 50px rgba(171, 70, 210, 0.3);
+        }
+
+        .stamp {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            border: 3px solid #ff0000;
+            color: #ff0000;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 10px;
+            transform: rotate(-15deg);
+            opacity: 0.8;
+            letter-spacing: 2px;
+        }
+
+        .neon-text {
+            color: #fff;
+            text-shadow: 0 0 10px #AB46D2, 0 0 20px #AB46D2, 0 0 40px #AB46D2;
+            font-family: 'Courier New', monospace; /* 更有打字機/科技感 */
+        }
+
+        .cert-content p { font-size: 16px; margin: 5px 0; color: #ccc; }
+        .cert-content strong { color: #fff; font-size: 20px; border-bottom: 1px solid #AB46D2; padding-bottom: 2px; }
+
+        .close-btn {
+            background: transparent;
+            border: 1px solid #666;
+            color: #888;
+            padding: 10px 30px;
+            border-radius: 20px;
+            margin-top: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .close-btn:hover { border-color: #AB46D2; color: #fff; background: rgba(171, 70, 210, 0.2); }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
-    <h1>💜 特訓中心</h1>
-    <a href="index.html" style="color:#888; text-decoration:none;">← 回首頁</a>
+    <h1 style="margin-bottom: 5px;">💜 特訓中心</h1>
+    <div style="font-size: 12px; color: #666; margin-bottom: 20px;">PROJECT BORAHAE: TRAINING GROUND</div>
+    
+    <a href="index.html">← 回首頁 (Back)</a>
     <br><br>
-    <input type="text" id="army-name" placeholder="輸入暱稱" style="padding:10px; border-radius:5px; border:1px solid #AB46D2; background:#222; color:#fff;">
+    
+    <input type="text" id="army-name" placeholder="請輸入你的暱稱 (Your Name)">
     
     <div id="progress-container"><div id="progress-bar"></div></div>
-    <div id="progress-text">載入中...</div>
+    <div id="progress-text" style="color: #AB46D2; font-weight: bold;">0 / 2</div>
 
-    <div id="dynamic-song-list" class="song-list"></div>
+    <div class="song-list">
+        <label class="song-item"><input type="checkbox" id="mic_drop"> 1. Mic Drop</label>
+        <label class="song-item"><input type="checkbox" id="dna"> 2. DNA (Coming Soon)</label>
+        </div>
 
-    <button id="btn-cert" disabled>🔒 領取證書</button>
+    <button id="btn-cert" disabled>🔒 完成所有訓練以解鎖</button>
 
     <div id="certificate-overlay">
-        <div id="cert-card">
-            <h2>CERTIFICATE</h2>
-            <div style="font-size:40px;">🏅</div>
-            <p>This certifies that</p>
-            <h1 id="cert-name" style="color:#AB46D2;">ARMY</h1>
-            <p>Has completed the training.</p>
-            <p id="cert-date" style="font-size:12px; color:#888;"></p>
+        <div class="cert-card">
+            <div class="stamp">TOP SECRET</div>
+            <h2 style="margin: 0; color: #fff; letter-spacing: 2px;">MISSION ACCOMPLISHED</h2>
+            <p style="color:#666; font-size:10px; letter-spacing: 1px; margin-top: 5px;">SPECIAL OPERATIONS: FANCHANT TRAINING</p>
+            
+            <div class="cert-content" style="margin-top: 20px;">
+                <h1 class="neon-text" style="font-size:32px; margin:20px 0; line-height: 1.2;">Elite<br>ARMY</h1>
+                <p>茲證明</p>
+                <p><strong><span id="cert-name-display">ARMY</span></strong></p>
+                <p style="margin-top: 10px;">已全數通過特訓中心考核。</p>
+                <p style="font-size:12px; color:#aaa;">(Has fully mastered the chants)</p>
+                
+                <p id="cert-date-display" style="font-size:12px; color:#666; margin-top:15px; font-family: monospace;"></p>
+            </div>
+
+            <div style="margin-top:25px; color:#AB46D2; font-size:12px; border-top: 1px solid #333; padding-top: 10px; width: 80%; margin-left: auto; margin-right: auto;">
+                Verified by Project Borahae
+            </div>
+            
+            <button class="close-btn" onclick="document.getElementById('certificate-overlay').style.display='none'">
+                關閉並返回 (截圖留念)
+            </button>
         </div>
-        <p style="color:#fff;">請截圖分享 ✨</p>
-        <button class="close-btn" onclick="document.getElementById('certificate-overlay').style.display='none'">關閉</button>
     </div>
 
     <script>
-        const songListContainer = document.getElementById('dynamic-song-list');
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         const btnCert = document.getElementById('btn-cert');
         const nameInput = document.getElementById('army-name');
 
-        // 1. 動態生成歌曲清單
-        function renderSongs() {
-            songListContainer.innerHTML = '';
-            
-            // 遍歷 songs.js 裡的 songLibrary
-            Object.keys(songLibrary).forEach((key, index) => {
-                const song = songLibrary[key];
-                // 抓取該首歌曲的練習次數
-                const count = parseInt(localStorage.getItem(`${key}_count`) || '0');
-                const isMaster = count >= 3;
-
-                const item = document.createElement('div');
-                item.className = 'song-item';
-                item.innerHTML = `
-                    <div class="song-info">
-                        <input type="checkbox" id="check-${key}" ${isMaster ? 'checked' : ''} disabled>
-                        <span>${index + 1}. ${song.title}</span>
-                    </div>
-                    <div class="count-tag">
-                        ${isMaster ? '✅ 大師 (3/3)' : `🔒 累積: ${count}/3`}
-                    </div>
-                `;
-                songListContainer.appendChild(item);
-            });
-            updateUI();
-        }
-
+        // 更新介面與存檔
         function updateUI() {
-            const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-            const checked = document.querySelectorAll('input:checked').length;
-            const total = allCheckboxes.length;
-            const percent = total === 0 ? 0 : (checked / total) * 100;
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            const total = checkboxes.length;
+            const percent = (checked / total) * 100;
             
             progressBar.style.width = percent + "%";
             progressText.innerText = `已完成 ${checked} / ${total}`;
             
-            if (percent === 100 && total > 0) {
+            if (percent === 100) {
                 btnCert.disabled = false;
                 btnCert.classList.add('unlocked');
-                btnCert.innerText = "🏆 領取證書";
+                btnCert.innerHTML = "🏆 領取結業證書 <br><span style='font-size:12px'>(Claim Certificate)</span>";
             } else {
                 btnCert.disabled = true;
                 btnCert.classList.remove('unlocked');
-                btnCert.innerText = "🔒 領取證書";
+                btnCert.innerText = "🔒 完成所有訓練以解鎖";
             }
             
-            // 存檔名字
+            // 存檔
+            const data = {};
+            checkboxes.forEach(box => data[box.id] = box.checked);
+            localStorage.setItem('army_progress', JSON.stringify(data));
             localStorage.setItem('army_name', nameInput.value);
         }
 
-        // 初始化
+        // 初始化：讀檔
+        const savedData = JSON.parse(localStorage.getItem('army_progress')) || {};
+        checkboxes.forEach(box => {
+            if (savedData[box.id]) box.checked = true;
+            box.addEventListener('change', updateUI);
+        });
+        
         nameInput.value = localStorage.getItem('army_name') || "";
         nameInput.addEventListener('input', updateUI);
         
-        // 執行渲染
-        if (typeof songLibrary !== 'undefined') {
-            renderSongs();
-        } else {
-            progressText.innerText = "錯誤：無法讀取歌曲庫";
-        }
+        // 第一次執行 UI 更新
+        updateUI();
 
+        // 按鈕點擊事件：顯示證書
         btnCert.addEventListener('click', () => {
-            document.getElementById('cert-name').innerText = nameInput.value || "ARMY";
-            document.getElementById('cert-date').innerText = new Date().toLocaleDateString();
-            document.getElementById('certificate-overlay').style.display = 'flex';
+            const userName = nameInput.value.trim() || "ARMY";
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+            
+            document.getElementById('cert-name-display').innerText = userName;
+            document.getElementById('cert-date-display').innerText = `Date: ${dateStr}`;
+            
+            const overlay = document.getElementById('certificate-overlay');
+            overlay.style.display = 'flex';
+            
+            // 手機震動回饋 (如果支援)
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
         });
     </script>
 </body>
