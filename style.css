@@ -490,22 +490,36 @@ input:checked + .slider:before {
    🔥 I Need U 特效組：夕陽 + 餘燼
 =========================== */
 
-/* 1. 夕陽背景罩層 */
+/* 1. 夕陽背景罩層 (微調版) */
 #sunset-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    /* 初始狀態：透明 */
     opacity: 0;
-    /* 漸層色：深藍 -> 紫紅 -> 橘黃 (模擬黃昏) */
-    background: linear-gradient(to bottom, #2c3e50, #4a144b, #ff4500, #ffae00);
-    z-index: 1; /* 在最底層背景之上 */
-    transition: opacity 3s ease-in-out; /* 緩慢出現/消失 (3秒) */
+    
+    /* 👇 改成較深沉、不刺眼的漸層 (Deep Blue -> Dark Purple -> Muted Orange) */
+    background: linear-gradient(to bottom, 
+        rgba(15, 32, 39, 0.9), 
+        rgba(32, 58, 67, 0.8), 
+        rgba(44, 83, 100, 0.6), 
+        rgba(255, 69, 0, 0.4)
+    );
+    
+    z-index: 1; 
+    transition: opacity 3s ease-in-out; 
     pointer-events: none;
 }
 
-/* 啟動夕陽時的狀態 */
+/* 啟動時的狀態 */
 #sunset-overlay.active {
-    opacity: 0.8; /* 稍微保留一點原本黑色背景的質感 */
+    /* 👇 這裡原本是 0.8，改成 0.3 或 0.4 (讓它變得很透) */
+    opacity: 0.35; 
+}
+
+/* 👇 確保歌詞永遠最亮、在最上層 */
+#lyric-box {
+    position: relative;
+    z-index: 99; /* 強制置頂 */
+    text-shadow: 0 0 10px #000; /* 加強文字陰影，確保在任何背景都看得清 */
 }
 
 /* 2. 火星餘燼粒子 */
@@ -539,4 +553,5 @@ input:checked + .slider:before {
         opacity: 0;
     }
 }
+
 
