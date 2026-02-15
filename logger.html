@@ -200,9 +200,9 @@
             <div class="log-item" data-id="${log.id}" data-type="${log.type}">
                 <span>${log.time}ms</span> 
                 <select onchange="updateLogType(${log.id}, this.value)">
-                    <option value="chant" ${log.type === 'chant' ? 'selected' : ''}>💜 Chant</option>
-                    <option value="sing" ${log.type === 'sing' ? 'selected' : ''}>🧊 Sing</option>
-                    <option value="scream" ${log.type === 'scream' ? 'selected' : ''}>🔥 Scream</option>
+                    <option value="chant" ${log.type === 'chant' ? 'selected' : ''}>💜 chant</option>
+                    <option value="sing" ${log.type === 'sing' ? 'selected' : ''}>🧊 sing</option>
+                    <option value="scream" ${log.type === 'scream' ? 'selected' : ''}>🔥 scream</option>
                 </select>
                 <input type="text" value="${log.text}" oninput="updateLogText(${log.id}, this.value)" placeholder="輸入應援詞...">
                 <button class="del-btn" onclick="removeLog(${log.id})">✕</button>
@@ -272,5 +272,6 @@
 </script>
 </body>
 </html>
+
 
 
