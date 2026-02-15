@@ -17,5 +17,11 @@ const songLibrary = {
         videoId: "S7Z9O1UEjWc",
         bpm: 53.5,
         file: "lyrics/spring_day.json"
+    },
+    "i_need_you": {
+        title: "❤️‍🔥 I Need U",
+        videoId: "MUrVHhYMtWo",
+        bpm: 79,
+        file: "lyrics/i_need_you.json"
     }
 };
