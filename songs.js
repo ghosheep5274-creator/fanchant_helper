@@ -11,5 +11,11 @@ const songLibrary = {
         videoId: "G3o94Cajmrs",
         bpm: 65,
         file: "lyrics/dna.json"
+    },
+    "spring_day": {
+        title: "🌸 Spring Day",
+        videoId: "S7Z9O1UEjWc",
+        bpm: 53.5,
+        file: "lyrics/spring_day.json"
     }
 };
