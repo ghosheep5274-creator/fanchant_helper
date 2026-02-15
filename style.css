@@ -514,7 +514,7 @@ input:checked + .slider:before {
 /* 啟動時的狀態 */
 #sunset-overlay.active {
     /* 👇 這裡原本是 0.8，改成 0.3 或 0.4 (讓它變得很透) */
-    opacity: 0.35; 
+    opacity: 0.6; 
 }
 
 
@@ -550,6 +550,7 @@ input:checked + .slider:before {
         opacity: 0;
     }
 }
+
 
 
 
