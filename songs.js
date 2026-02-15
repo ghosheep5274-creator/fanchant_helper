@@ -8,8 +8,8 @@ const songLibrary = {
     },
    // "dna": {
    //     title: "🧬 DNA",
-   //     videoId: "MBdVXkSdhwU",
-   //     bpm: 130,
+   //     videoId: "G3o94Cajmrs",
+   //     bpm: 65,
    //     file: "lyrics/dna.json"
    // }
 };
