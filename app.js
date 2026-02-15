@@ -462,7 +462,7 @@ function createPetal() {
     // 隨機屬性
     const size = Math.random() * 10 + 5 + 'px'; // 大小 5~15px
     const left = Math.random() * 100 + 'vw'; // 水平位置 0~100%
-    const duration = Math.random() * 3 + 4 + 's'; // 飄落時間 4~7秒 (慢一點比較溫柔)
+    const duration = Math.random() * 5 + 8 + 's'; // 飄落時間 4~7秒 (慢一點比較溫柔)
     const delay = Math.random() * 2 + 's'; // 隨機延遲
 
     petal.style.width = size;
@@ -483,5 +483,6 @@ function createPetal() {
         petal.remove();
     }, parseFloat(duration) * 1000);
 }
+
 
 
