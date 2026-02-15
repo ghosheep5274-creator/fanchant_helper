@@ -42,10 +42,13 @@
   { "time": 133969, "text": "Pi-ryo-hae", "type": "chant" },
   { "time": 142705, "text": "(I need you girl)-①", "type": "chant" },
   { "time": 145753, "text": "(I need you girl)-②", "type": "chant" },
+  { "time": 148300, "text": "", "type": "sunset_start" },
   { "time": 148389, "text": "Girl!-①", "type": "chant" },
   { "time": 149292, "text": "scream!", "type": "scream" },
   { "time": 154465, "text": "Girl!-②", "type": "chant" },
   { "time": 163274, "text": "scream!", "type": "scream" },
+  // 🔥 副歌爆發點，火星開始向上飄
+  { "time": 173925, "text": "", "type": "ember_start" },
   { "time": 175024, "text": "Wae-①", "type": "chant" },
   { "time": 181102, "text": "Wae-②", "type": "chant" },
   { "time": 184066, "text": "Pi-ryo-hae", "type": "chant" },
@@ -59,5 +62,8 @@
   { "time": 204628, "text": "BTS!", "type": "chant" },
   { "time": 206139, "text": "BTS!", "type": "chant" },
   { "time": 207680, "text": "BTS!", "type": "chant" },
-  { "time": 209164, "text": "BTS!", "type": "chant" }
+  { "time": 209164, "text": "BTS!", "type": "chant" },
+  // 🛑 全部關閉
+  { "time": 212263, "text": "", "type": "ember_stop" },
+  { "time": 212263, "text": "", "type": "sunset_stop" }
 ]
