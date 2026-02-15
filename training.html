@@ -155,53 +155,102 @@
         </div>
     </div>
 
-    <script>
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+<script>
+        // 設定每首歌統一的練習目標次數
+        const TARGET_COUNT = 3;
+
+        const container = document.getElementById('dynamic-list');
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         const btnCert = document.getElementById('btn-cert');
         const nameInput = document.getElementById('army-name');
 
-        // 更新介面與存檔
-        function updateUI() {
-            const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
-            const total = checkboxes.length;
-            const percent = (checked / total) * 100;
+        function initTraining() {
+            // 🛑 1. 檢查 songLibrary 是否存在
+            if (typeof songLibrary === 'undefined') {
+                container.innerHTML = "<p style='color:red'>找不到 songLibrary！<br>請確認 songs.js 已載入。</p>";
+                return;
+            }
+
+            container.innerHTML = ""; // 清空容器
+            let completedCount = 0;
             
+            // 🔄 2. 將物件轉換為陣列來跑迴圈
+            // Object.entries 會把 { key: val } 轉成 [key, val]
+            const songEntries = Object.entries(songLibrary);
+            const totalSongs = songEntries.length;
+
+            songEntries.forEach(([id, data], index) => {
+                // id 就是 "mic_drop" 或 "dna"
+                // data.title 就是 "🎤 MIC Drop"
+                
+                const countKey = `${id}_count`;
+                const currentCount = parseInt(localStorage.getItem(countKey) || '0');
+                const isDone = currentCount >= TARGET_COUNT;
+
+                if (isDone) completedCount++;
+
+                // 建立 HTML 元素
+                const label = document.createElement('label');
+                label.className = 'song-item';
+                
+                // Checkbox
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = isDone;
+                checkbox.disabled = true; // 鎖定狀態
+
+                // 文字描述 (顯示 data.title)
+                const textSpan = document.createElement('span');
+                textSpan.innerText = `${index + 1}. ${data.title}`;
+
+                // 狀態顯示 (ex: ✅ 3/3)
+                const statusSpan = document.createElement('span');
+                statusSpan.style.marginLeft = 'auto';
+                statusSpan.style.fontSize = '12px';
+                
+                if (isDone) {
+                    statusSpan.innerHTML = `✅ (${currentCount}/${TARGET_COUNT})`;
+                    statusSpan.style.color = '#00ff00';
+                } else {
+                    statusSpan.innerHTML = `💪 (${currentCount}/${TARGET_COUNT})`;
+                    statusSpan.style.color = '#888';
+                }
+
+                // 組裝
+                label.appendChild(checkbox);
+                label.appendChild(textSpan);
+                label.appendChild(statusSpan);
+                container.appendChild(label);
+            });
+
+            // 更新進度條 UI
+            const percent = (completedCount / totalSongs) * 100;
             progressBar.style.width = percent + "%";
-            progressText.innerText = `已完成 ${checked} / ${total}`;
-            
-            if (percent === 100) {
+            progressText.innerText = `已完成 ${completedCount} / ${totalSongs}`;
+
+            // 解鎖證書邏輯
+            if (completedCount === totalSongs && totalSongs > 0) {
                 btnCert.disabled = false;
                 btnCert.classList.add('unlocked');
-                btnCert.innerHTML = "🏆 領取結業證書 <br><span style='font-size:12px'>(Claim Certificate)</span>";
+                btnCert.innerHTML = "🏆 領取菁英證書 <br><span style='font-size:12px'>(Claim Certificate)</span>";
             } else {
                 btnCert.disabled = true;
                 btnCert.classList.remove('unlocked');
                 btnCert.innerText = "🔒 完成所有訓練以解鎖";
             }
-            
-            // 存檔
-            const data = {};
-            checkboxes.forEach(box => data[box.id] = box.checked);
-            localStorage.setItem('army_progress', JSON.stringify(data));
-            localStorage.setItem('army_name', nameInput.value);
         }
 
-        // 初始化：讀檔
-        const savedData = JSON.parse(localStorage.getItem('army_progress')) || {};
-        checkboxes.forEach(box => {
-            if (savedData[box.id]) box.checked = true;
-            box.addEventListener('change', updateUI);
-        });
-        
+        // 讀取名字
         nameInput.value = localStorage.getItem('army_name') || "";
-        nameInput.addEventListener('input', updateUI);
-        
-        // 第一次執行 UI 更新
-        updateUI();
+        nameInput.addEventListener('input', () => {
+            localStorage.setItem('army_name', nameInput.value);
+        });
 
-        // 按鈕點擊事件：顯示證書
+        // 啟動！
+        initTraining();
+
+        // 證書按鈕事件
         btnCert.addEventListener('click', () => {
             const userName = nameInput.value.trim() || "ARMY";
             const now = new Date();
@@ -209,14 +258,11 @@
             
             document.getElementById('cert-name-display').innerText = userName;
             document.getElementById('cert-date-display').innerText = `Date: ${dateStr}`;
-            
-            const overlay = document.getElementById('certificate-overlay');
-            overlay.style.display = 'flex';
-            
-            // 手機震動回饋 (如果支援)
+            document.getElementById('certificate-overlay').style.display = 'flex';
             if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
         });
     </script>
 </body>
 </html>
+
 
