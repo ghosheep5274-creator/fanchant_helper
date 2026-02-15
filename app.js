@@ -258,7 +258,7 @@ window.togglePlay = function() {
 
 window.returnToHome = function() {
     if (confirm("確定要回到首頁嗎？目前的練習將不會計次。")) {
-        closeCertificate();
+        resetToTitle();
     }
 };
 
@@ -351,6 +351,7 @@ function renderSyncTimer(ms) {
     let deci = Math.floor((ms % 1000) / 100); 
     syncTimer.innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}.${deci}`;
 }
+
 
 
 
