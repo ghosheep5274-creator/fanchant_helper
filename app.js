@@ -770,22 +770,29 @@ function initMagicSky() {
 function setMagicStage(stage) {
     initMagicSky();
     
-    // 清除舊狀態
+    // 1. 移除所有狀態 class (這會觸發 CSS 的淡出)
     document.body.classList.remove('magic-stage-1', 'magic-stage-2', 'magic-stage-3');
-    stopMeteors(); // 切換階段時先停流星
+    
+    // 2. 停止生成新流星
+    stopMeteors(); 
+
+    // 🔴 3. 強力清場：馬上移除畫面上所有殘留的流星 (修正卡住問題)
+    const existingMeteors = document.querySelectorAll('.shooting-star');
+    existingMeteors.forEach(m => m.remove());
 
     if (stage === 1) {
-        document.body.classList.add('magic-stage-1'); // 深藍夜空
+        document.body.classList.add('magic-stage-1');
         console.log("🔮 Magic: 深淵夜空");
     } else if (stage === 2) {
-        document.body.classList.add('magic-stage-1', 'magic-stage-2'); // + 星星閃爍
+        document.body.classList.add('magic-stage-1', 'magic-stage-2');
         console.log("🔮 Magic: 銀河閃爍");
     } else if (stage === 3) {
-        document.body.classList.add('magic-stage-1', 'magic-stage-2'); // 維持星星
-        startMeteors(); // + 開始丟流星
+        document.body.classList.add('magic-stage-1', 'magic-stage-2');
+        startMeteors();
         console.log("🔮 Magic: 流星雨");
     } else {
-        console.log("🔮 Magic: 關閉");
+        // stage 為 0 或 magic_off 時
+        console.log("🔮 Magic: 全關 (OFF)");
     }
 }
 
@@ -828,5 +835,6 @@ function clearMagicEffects() {
     setMagicStage(0);
     stopMeteors();
 }
+
 
 
