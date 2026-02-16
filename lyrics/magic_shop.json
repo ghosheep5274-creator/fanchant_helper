@@ -1,5 +1,5 @@
 [
-  { "time": 500, "text": "", "type": "wait" },
+  { "time": 500, "text": "Waiting for beat...", "type": "wait" },
   { "time": 53426, "text": "Nae-ga na-in ge sil-eun nal", "type": "sing" },
   { "time": 56047, "text": "yeong-yeong sa-ra-ji-go sip-eun nal", "type": "sing" },
   { "time": 59316, "text": "Mun-eul ha-na man-deul-ja", "type": "sing" },
