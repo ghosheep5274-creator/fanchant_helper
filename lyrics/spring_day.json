@@ -30,5 +30,6 @@
   { "time": 243144, "text": "(Man-na-reo gal-ge)", "type": "sing" },
   { "time": 247625, "text": "(De-ri-reo gal-ge)", "type": "sing" },
   { "time": 271894, "text": "(Live) wo wo wo ~~", "type": "wave" },
-  { "time": 271900, "text": "", "type": "sakura_stop" }
+  { "time": 273000, "text": "", "type": "sakura_stop" },
+  { "time": 273000, "text": "", "type": "end" }
 ]
