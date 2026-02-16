@@ -582,15 +582,16 @@ input:checked + .slider:before {
 
 /* 2. 單棟建築物 (半透明深藍) + 垂直漸層 (頂部透明 -> 底部深色) */
 .building {
-    /* 1. 漸層維持不變 (底部深、頂部透) */
-    background: linear-gradient(to bottom, rgba(5, 16, 59, 0.3) 0%, rgba(5, 16, 59, 0.95) 100%);
+/* 🔴 修改：改成「實心」不透明漸層 (午夜藍 -> 純黑) */
+    /* 這樣重疊時，前面的房子就會蓋住後面的，不會透視 */
+    background: linear-gradient(to bottom, #142850 0%, #000000 100%);
     
     /* 🔴 關鍵修改 1：使用負邊距，讓建築物互相「踩」到一點點，消除縫隙 */
     margin-left: -2%; 
     
     /* 🔴 關鍵修改 2：利用右側陰影來區分前後，而不是用邊框線 */
     /* 這樣看起來會有立體層次，但不會有一條一條的死板線條 */
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.8);
     
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
@@ -612,14 +613,18 @@ input:checked + .slider:before {
 /* 3. 田字窗戶 (加寬十字線 + 半透明) */
 .city-window {
     position: absolute;
-/* ✅ 1. 窗戶光：改成暖色調 (Warm Light) 且透明度設為 0.5，柔和不搶眼 */
-    background-color: rgba(255, 230, 150, 0.5);
+/* 底色透明 (靠漸層畫線條) */
+    background-color: transparent;
     
-/* ✅ 2. 十字窗框：使用黑色半透明線條，看起來更像建築結構 */
-    /* 這裡設定線條佔 20% 寬度 (40%~60% 區間) */
-    background-image: 
-        linear-gradient(to right, transparent 40%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.6) 60%, transparent 60%),
-        linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.6) 60%, transparent 60%);
+    /* 🔴 修改：改成「橫條紋」樣式 (模擬樓層光) */
+    /* 亮黃色線條 (2px) + 透明間隔 (2px) = 現代大樓感 */
+    background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 235, 59, 0.7) 0px, 
+        rgba(255, 235, 59, 0.7) 2px, 
+        transparent 2px, 
+        transparent 5px
+    );
     
     height: 14px; 
     border-radius: 1px;
@@ -666,6 +671,7 @@ body.city-stage-2 .city-window {
     0% { transform: translate(0, 0) scale(1); opacity: 1; }
     100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
+
 
 
 
