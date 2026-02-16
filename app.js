@@ -281,6 +281,13 @@ function render(lyricObj) {
     if (lyricObj.type === 'ember_start') { startEmbers(); return; }
     if (lyricObj.type === 'ember_stop') { stopEmbers(); return; }
 
+    // 💖 Boy With Luv 指令
+    if (lyricObj.type === 'city_1') { setCityStage(1); return; } // 朦朧
+    if (lyricObj.type === 'city_2') { setCityStage(2); return; } // 清晰霓虹
+    if (lyricObj.type === 'city_off') { setCityStage(0); return; } // 關閉
+    if (lyricObj.type === 'firework_start') { startFireworks(); return; } // 煙火
+    if (lyricObj.type === 'firework_stop') { stopFireworks(); return; }   // 停煙火
+
     
     // 處理特殊 Type 樣式
     if (lyricObj.type === 'warning') {
@@ -399,6 +406,7 @@ function finishGame() {
     //🌸 新增：歌曲結束時停止生成 (舊的讓它飄完很美)
     stopSakura();
     clearAllEffects(); // 👈 歌曲結束也清空
+    clearCityEffects(); // 💖 新增這行
     
     // 延遲後回首頁
     setTimeout(() => {
@@ -422,6 +430,7 @@ function resetToTitle() {
     }
     clearSakura();
     clearAllEffects(); // 👈 改用這個大掃除函式
+    clearCityEffects(); // 💖 新增這行
     updatePauseButton(false);
 }
 
@@ -578,6 +587,112 @@ function createEmber() {
 
     setTimeout(() => { ember.remove(); }, parseFloat(duration) * 1000);
 }
+
+// ===========================
+// 💖 Boy With Luv Engine
+// ===========================
+
+let fireworkInterval = null;
+
+// 初始化城市 (造房子)
+function initCity() {
+    if (document.getElementById('bwl-city')) return; // 避免重複造城
+
+    const cityContainer = document.createElement('div');
+    cityContainer.id = 'bwl-city';
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'bwl-overlay';
+
+    document.body.insertBefore(cityContainer, document.body.firstChild);
+    document.body.insertBefore(overlay, document.body.firstChild);
+
+    // 生成約 30~40 棟建築物填滿畫面
+    for (let i = 0; i < 40; i++) {
+        const b = document.createElement('div');
+        b.classList.add('building');
+        // 隨機高度 10% ~ 50%
+        b.style.height = (Math.random() * 40 + 10) + 'vh'; 
+        // 隨機寬度
+        b.style.width = (Math.random() * 3 + 1) + '%';
+        cityContainer.appendChild(b);
+    }
+}
+
+// 設定舞台階段 (0=關閉, 1=朦朧, 2=霓虹)
+function setCityStage(stage) {
+    initCity(); // 確保城市存在
+    
+    // 清除舊狀態
+    document.body.classList.remove('city-stage-1', 'city-stage-2');
+
+    if (stage === 1) {
+        document.body.classList.add('city-stage-1');
+        console.log("🏙️ 城市：朦朧模式");
+    } else if (stage === 2) {
+        document.body.classList.add('city-stage-2');
+        console.log("🌆 城市：霓虹全開");
+    } else {
+        console.log("🌃 城市：關燈");
+    }
+}
+
+// --- 煙火系統 ---
+function startFireworks() {
+    if (fireworkInterval) return;
+    console.log("🎆 煙火秀開始！");
+    // 每 500ms 放一顆煙火
+    fireworkInterval = setInterval(createFirework, 500);
+}
+
+function stopFireworks() {
+    if (fireworkInterval) {
+        clearInterval(fireworkInterval);
+        fireworkInterval = null;
+    }
+}
+
+// 產生一顆煙火 (包含爆炸出的 20 顆粒子)
+function createFirework() {
+    const startX = Math.random() * window.innerWidth;
+    const startY = Math.random() * (window.innerHeight * 0.6); // 只在上半部爆炸
+    
+    // 隨機顏色：粉紅、金、紫、青
+    const colors = ['#FF69B4', '#FFD700', '#8A2BE2', '#00FFFF'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    // 產生 20 個粒子向四面八方炸開
+    for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.classList.add('firework-particle');
+        p.style.backgroundColor = color;
+        p.style.left = startX + 'px';
+        p.style.top = startY + 'px';
+        
+        // 計算爆炸方向 (三角函數)
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 100 + 50; // 爆炸半徑
+        const tx = Math.cos(angle) * velocity + 'px';
+        const ty = Math.sin(angle) * velocity + 'px';
+        
+        p.style.setProperty('--tx', tx);
+        p.style.setProperty('--ty', ty);
+        
+        document.body.appendChild(p);
+        
+        // 動畫結束後移除
+        setTimeout(() => p.remove(), 1000);
+    }
+}
+
+// 清除所有 BWL 特效
+function clearCityEffects() {
+    setCityStage(0); // 關燈
+    stopFireworks();
+    // 移除殘留粒子
+    document.querySelectorAll('.firework-particle').forEach(el => el.remove());
+}
+
 
 
 
