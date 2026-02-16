@@ -66,16 +66,13 @@ body {
     position: absolute;
     top: 10px;
     
-    /* 關鍵修改說明：
-       1. 時間改為 0.705s (這是 85 BPM 的一拍長度)
-       2. 加入 'alternate' (這是讓它「來回播放」的關鍵指令)
-       3. ease-in-out 讓它在兩端會減速，像真的鐘擺
-    */
+    /* 🔴 1. 加上這一行：開啟 GPU 硬體加速 */
+    will-change: transform, left; 
+    
+    /* 🔴 2. 加上這一行：把陰影固定在這裡，不要放在動畫裡 */
+    text-shadow: 0 0 15px #AB46D2; 
+
     animation: swing-beat 0.705s infinite alternate ease-in-out;
-    /* 🔴 加入這三行，開啟 GPU 硬體加速 */
-    will-change: transform;       /* 告訴瀏覽器：這傢伙會動，請準備好 */
-    transform: translateZ(0);     /* 騙瀏覽器開啟 3D 加速 */
-    backface-visibility: hidden;  /* 防止旋轉時的邊緣閃爍 */
 }
 
 /* 定義動作：從最左邊 (from) 到最右邊 (to) */
@@ -83,12 +80,10 @@ body {
     from { 
         left: 0; 
         transform: rotate(-20deg) scale(1); /* 向左傾斜 */
-        text-shadow: -2px 0 5px #AB46D2;   /* 左邊發光 */
     }
     to { 
         left: 170px; /* 跑到右邊 (容器寬 200 - 愛心寬 30) */
         transform: rotate(20deg) scale(1.1); /* 向右傾斜 + 稍微變大 */
-        text-shadow: 2px 0 5px #AB46D2;     /* 右邊發光 */
     }
 }
 
@@ -673,6 +668,7 @@ body.city-stage-2 .city-window {
     0% { transform: translate(0, 0) scale(1); opacity: 1; }
     100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
+
 
 
 
