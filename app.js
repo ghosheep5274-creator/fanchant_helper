@@ -532,8 +532,8 @@ function hideSunset() {
 function startEmbers() {
     if (emberInterval) return;
     console.log("🔥 餘燼開始燃燒");
-    // 頻率：每 120ms 產生一顆 (密集一點比較有燃燒感)
-    emberInterval = setInterval(createEmber, 120);
+    // 頻率：每 200ms 產生一顆 (密集一點比較有燃燒感)
+    emberInterval = setInterval(createEmber, 200);
 }
 
 // 停止火星生成
@@ -578,5 +578,6 @@ function createEmber() {
 
     setTimeout(() => { ember.remove(); }, parseFloat(duration) * 1000);
 }
+
 
 
