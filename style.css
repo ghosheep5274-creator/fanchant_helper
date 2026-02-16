@@ -671,21 +671,75 @@ body.city-stage-2 .city-window {
 
 
 
+/* ===========================
+   🔮 Magic Shop 特效組：魔法星空
+=========================== */
 
+/* 1. 魔法夜空背景 (預設隱藏) */
+#magic-sky {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* 深藍 -> 深紫 -> 黑色 的魔法漸層 */
+    background: radial-gradient(circle at bottom, #2E004E 0%, #190028 40%, #000000 100%);
+    z-index: 1; /* 在最底層，但蓋住原本的黑底 */
+    opacity: 0;
+    transition: opacity 3s ease-in-out;
+    pointer-events: none;
+}
 
+/* 2. 星星 (預設不閃爍) */
+.magic-star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0; /* 預設隱藏 */
+    box-shadow: 0 0 4px #fff; /* 微微發光 */
+    will-change: opacity; /* 效能優化 */
+}
 
+/* 星星閃爍動畫 */
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px #fff; }
+}
 
+/* 3. 流星 (Shooting Star) */
+.shooting-star {
+    position: absolute;
+    width: 100px; /* 流星長度 */
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%);
+    opacity: 0;
+    transform: rotate(-45deg); /* 左上往右下飛 */
+    animation: shoot 2s linear forwards;
+    will-change: transform, opacity;
+}
 
+/* 流星劃過動畫 */
+@keyframes shoot {
+    0% {
+        transform: translate(0, 0) rotate(-45deg) scale(0.5);
+        opacity: 0;
+    }
+    10% { opacity: 1; } /* 瞬間變亮 */
+    80% { opacity: 1; }
+    100% {
+        /* 往右下飛 800px */
+        transform: translate(800px, 800px) rotate(-45deg) scale(1);
+        opacity: 0;
+    }
+}
 
+/* --- 階段控制 --- */
 
+/* Stage 1: 只有夜空 (背景浮現) */
+body.magic-stage-1 #magic-sky { opacity: 1; }
 
+/* Stage 2: 星星出現 + 閃爍 */
+body.magic-stage-2 .magic-star {
+    /* 隨機閃爍：時間 2s~4s */
+    animation: twinkle 3s infinite ease-in-out alternate;
+}
 
-
-
-
-
-
-
-
-
-
+/* Stage 3: 流星開始 (由 JS 控制生成) */
+/* CSS 這裡不需要特別寫，JS 會負責丟流星出來 */
