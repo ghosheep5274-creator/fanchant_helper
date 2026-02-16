@@ -31,7 +31,7 @@ const songLibrary = {
         file: "lyrics/boy_with_luv.json"
     },
     "magic_shop": {
-        title: "💖 Magic Shop",
+        title: "🌠 Magic Shop",
         videoId: "CP-Qh3KNTSQ",
         bpm: 75,
         file: "lyrics/magic_shop.json"
