@@ -71,6 +71,10 @@ body {
        3. ease-in-out 讓它在兩端會減速，像真的鐘擺
     */
     animation: swing-beat 0.705s infinite alternate ease-in-out;
+    /* 🔴 加入這三行，開啟 GPU 硬體加速 */
+    will-change: transform;       /* 告訴瀏覽器：這傢伙會動，請準備好 */
+    transform: translateZ(0);     /* 騙瀏覽器開啟 3D 加速 */
+    backface-visibility: hidden;  /* 防止旋轉時的邊緣閃爍 */
 }
 
 /* 定義動作：從最左邊 (from) 到最右邊 (to) */
@@ -509,6 +513,7 @@ input:checked + .slider:before {
     z-index: 1; 
     transition: opacity 3s ease-in-out; 
     pointer-events: none;
+    will-change: opacity; /* 告訴瀏覽器：只有透明度會變 */
 }
 
 /* 啟動時的狀態 */
@@ -550,6 +555,7 @@ input:checked + .slider:before {
         opacity: 0;
     }
 }
+
 
 
 
