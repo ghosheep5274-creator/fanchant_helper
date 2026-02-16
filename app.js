@@ -92,6 +92,23 @@ if (songSelect) {
     });
 }
 
+// --- 特效指令對照表 ---
+// 將歌詞 JSON 的 type 映射到對應的 JS 啟動/關閉函式
+const effectMap = {
+    "sakura": { start: startSakura, stop: stopSakura },
+    "sunset": { start: showSunset, stop: hideSunset },
+    "ember":  { start: startEmbers, stop: stopEmbers },
+    // 舞台類直接對應 function 並帶入參數
+    "city_1": () => setCityStage(1),
+    "city_2": () => setCityStage(2),
+    "city_off": () => setCityStage(0),
+    "magic_1": () => setMagicStage(1),
+    "magic_2": () => setMagicStage(2),
+    "magic_3": () => setMagicStage(3),
+    "magic_off": () => setMagicStage(0)
+};
+
+
 // [區域 C] 模式切換邏輯
 if (musicToggle) {
     musicToggle.addEventListener('change', (e) => {
@@ -837,6 +854,7 @@ function clearMagicEffects() {
     setMagicStage(0);
     stopMeteors();
 }
+
 
 
 
