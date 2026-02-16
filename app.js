@@ -596,6 +596,7 @@ let fireworkInterval = null;
 
 // 初始化城市 (造房子)
 function initCity() {
+    // 防止重複生成
     if (document.getElementById('bwl-city')) return;
 
     const cityContainer = document.createElement('div');
@@ -607,41 +608,41 @@ function initCity() {
     document.body.insertBefore(cityContainer, document.body.firstChild);
     document.body.insertBefore(overlay, document.body.firstChild);
 
-    // 🏗️ 數量減少：因為變寬了，約 15 棟就能填滿畫面並重疊
+    // 🏗️ 生成約 15 棟寬建築 (互相重疊)
     for (let i = 0; i < 15; i++) {
         const b = document.createElement('div');
         b.classList.add('building');
         
-        // 1. 高度維持 (15~40vh)
+        // 房屋高度 (15~40vh)
         b.style.height = (Math.random() * 25 + 15) + 'vh'; 
         
-        // 🔴 2. 寬度大幅增加：從 5~9% 改為 8~14%
-        // 寬胖的建築看起來比較像大樓，細長的像柱子
+        // 房屋寬度 (8~14%) - 比較寬，像大樓
         b.style.width = (Math.random() * 6 + 8) + '%';
         
-        // --- 窗戶邏輯 (維持之前的田字窗 + 防重疊) ---
-        const windowCount = Math.floor(Math.random() * 10) + 5;
-        let occupiedPositions = []; 
+        // --- 🪟 窗戶生成邏輯 (自然散落版) ---
+        
+        // 隨機數量：每棟 5 ~ 12 個窗戶
+        const windowCount = Math.floor(Math.random() * 8) + 5; 
 
-// 1. 增加窗戶數量：每棟樓生成 5~15 個窗戶，讓大樓看起來更熱鬧
-const windowCount = Math.floor(Math.random() * 10) + 5;
+        for (let j = 0; j < windowCount; j++) {
+            const w = document.createElement('div');
+            w.classList.add('city-window');
+            
+            // 1. 寬度隨機：佔建築的 20% ~ 60% (長短不一)
+            w.style.width = (Math.random() * 40 + 20) + '%';
+            
+            // 2. 水平位置隨機：10% ~ 50% (不要太靠邊緣)
+            w.style.left = (Math.random() * 40 + 10) + '%';
+            
+            // 3. 垂直位置隨機：5% ~ 90% (整棟樓都會亮燈！)
+            // 不再限制於上半部，這樣看起來才像有人住的真實大樓
+            w.style.top = (Math.random() * 85 + 5) + '%';
+            
+            b.appendChild(w);
+        }
 
-for (let j = 0; j < windowCount; j++) {
-    const w = document.createElement('div');
-    w.classList.add('city-window');
-
-    // 窗戶寬度 (30% ~ 60%)
-    w.style.width = (Math.random() * 30 + 30) + '%';
-    // 水平位置 (20% ~ 50%)
-    w.style.left = (Math.random() * 30 + 20) + '%';
-
-    // 🔴 關鍵修改：移除所有防重疊和區域限制邏輯
-    // 直接在 5% ~ 90% 的高度範圍內隨機分佈，模擬真實大樓的散落燈光
-    w.style.top = (Math.random() * 85 + 5) + '%';
-
-    b.appendChild(w);
-}
-}
+        cityContainer.appendChild(b);
+    }
 }
 
 // 設定舞台階段 (0=關閉, 1=朦朧, 2=霓虹)
@@ -717,6 +718,7 @@ function clearCityEffects() {
     // 移除殘留粒子
     document.querySelectorAll('.firework-particle').forEach(el => el.remove());
 }
+
 
 
 
