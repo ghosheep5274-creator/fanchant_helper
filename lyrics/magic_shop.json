@@ -1,5 +1,6 @@
 [
   { "time": 500, "text": "Waiting for beat...", "type": "wait" },
+  { "time": 53200, "text": "", "type": "magic_1" },
   { "time": 53426, "text": "Nae-ga na-in ge sil-eun nal", "type": "sing" },
   { "time": 56047, "text": "yeong-yeong sa-ra-ji-go sip-eun nal", "type": "sing" },
   { "time": 59316, "text": "Mun-eul ha-na man-deul-ja", "type": "sing" },
@@ -24,6 +25,7 @@
   { "time": 158842, "text": "gos-i gi-da-ril geo-ya", "type": "sing" },
   { "time": 162104, "text": "Mid-eo-do gwaen-chanh-a neol", "type": "sing" },
   { "time": 164941, "text": "wi-ro-hae-jul Magic Shop", "type": "sing" },
+  { "time": 168000, "text": "", "type": "magic_2" },
   { "time": 169321, "text": "Tta-tteut-han cha han jan-eul ma-si-myeo", "type": "sing" },
   { "time": 172276, "text": "Jeo eun-ha-su-reul ol-ryeo-da-bo-myeo", "type": "sing" },
   { "time": 175592, "text": "Neon gwaen-chanh-eul geo-ya oh yeo-gin Magic shop", "type": "sing" },
@@ -32,6 +34,7 @@
   { "time": 189484, "text": "(I'll show you)-③", "type": "sing" },
   { "time": 191579, "text": "show you-①", "type": "sing" },
   { "time": 193152, "text": "show you-②", "type": "sing" },
+  { "time": 232000, "text": "", "type": "magic_3" },
   { "time": 232354, "text": "You gave me the best of me", "type": "sing" },
   { "time": 235429, "text": "So you'll give you the best of you", "type": "sing" },
   { "time": 238732, "text": "Nal chaj-a-nae-janh-a", "type": "sing" },
@@ -45,5 +48,6 @@
   { "time": 266309, "text": "(I'll show you)-③", "type": "sing" },
   { "time": 268316, "text": "show you-①", "type": "sing" },
   { "time": 269903, "text": "show you-②", "type": "sing" },
+  { "time": 272943, "text": "", "type": "magic_off" },
   { "time": 272943, "text": "", "type": "end" }
 ]
