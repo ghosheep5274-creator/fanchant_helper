@@ -607,33 +607,42 @@ function initCity() {
     document.body.insertBefore(cityContainer, document.body.firstChild);
     document.body.insertBefore(overlay, document.body.firstChild);
 
-    // 生成約 30 棟建築物
-    for (let i = 0; i < 30; i++) {
+    // 🏗️ 房子數量減少 (因為變寬了)，大約 15~20 棟就夠填滿畫面
+    for (let i = 0; i < 20; i++) {
         const b = document.createElement('div');
         b.classList.add('building');
         
-        // 隨機高度 15vh ~ 50vh (稍微拉高一點)
-        b.style.height = (Math.random() * 30 + 15) + 'vh'; 
-        // 隨機寬度 3% ~ 6%
-        b.style.width = (Math.random() * 7 + 3) + '%';
+        // 1. 高度：拉高一點，更有大樓感 (20vh ~ 60vh)
+        b.style.height = (Math.random() * 40 + 20) + 'vh'; 
         
-        // 🆕 隨機生成窗戶 (每棟 2 ~ 5 個)
-        const windowCount = Math.floor(Math.random() * 4) + 2; 
+        // 2. 寬度：加寬！ (6% ~ 10%) -> 原本是 3~6%
+        b.style.width = (Math.random() * 4 + 6) + '%';
+        
+        // 3. 窗戶生成邏輯
+        const windowCount = Math.floor(Math.random() * 5) + 3; // 每棟 3~7 個窗戶
 
         for (let j = 0; j < windowCount; j++) {
             const w = document.createElement('div');
             w.classList.add('city-window');
             
-            // 隨機垂直位置 (10% ~ 90% 之間，避開樓頂和地板)
-            w.style.top = (Math.random() * 80 + 10) + '%';
-            
-            // 隨機水平位置 (稍微偏移一點，不要死板的置中)
-            // 讓窗戶在 10% ~ 50% 的範圍內浮動
-            w.style.left = (Math.random() * 40 + 10) + '%';
-            
-            // 隨機寬度 (有的窗戶寬，有的窄)
-            w.style.width = (Math.random() * 30 + 30) + '%';
+            // 窗戶寬度 (佔建築寬度的 40% ~ 70%)
+            w.style.width = (Math.random() * 30 + 40) + '%';
+            // 窗戶水平置中微調
+            w.style.left = (Math.random() * 20 + 20) + '%';
 
+            // 🔥 關鍵：窗戶位置分佈 (80% 在上層，20% 隨機)
+            let topPos;
+            const probability = Math.random(); // 擲骰子 0.0 ~ 1.0
+
+            if (probability < 0.8) {
+                // 🎯 80% 機率：集中在上層 1/5 ~ 1/6 區域 (約 5% ~ 20% 的位置)
+                topPos = (Math.random() * 15 + 5); 
+            } else {
+                // 🎲 20% 機率：散落在剩下的大樓身體 (25% ~ 90% 的位置)
+                topPos = (Math.random() * 65 + 25);
+            }
+
+            w.style.top = topPos + '%';
             b.appendChild(w);
         }
 
@@ -714,6 +723,7 @@ function clearCityEffects() {
     // 移除殘留粒子
     document.querySelectorAll('.firework-particle').forEach(el => el.remove());
 }
+
 
 
 
