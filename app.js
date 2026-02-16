@@ -607,39 +607,36 @@ function initCity() {
     document.body.insertBefore(cityContainer, document.body.firstChild);
     document.body.insertBefore(overlay, document.body.firstChild);
 
-    // 生成約 20 棟建築物
-    for (let i = 0; i < 20; i++) {
+    // 🏗️ 數量減少：因為變寬了，約 15 棟就能填滿畫面並重疊
+    for (let i = 0; i < 15; i++) {
         const b = document.createElement('div');
         b.classList.add('building');
         
+        // 1. 高度維持 (15~40vh)
         b.style.height = (Math.random() * 25 + 15) + 'vh'; 
-        b.style.width = (Math.random() * 4 + 5) + '%';
         
-        // 🏗️ 窗戶生成邏輯 (防重疊版)
-        const windowCount = Math.floor(Math.random() * 3) + 2; // 每棟 2~4 個窗戶
+        // 🔴 2. 寬度大幅增加：從 5~9% 改為 8~14%
+        // 寬胖的建築看起來比較像大樓，細長的像柱子
+        b.style.width = (Math.random() * 6 + 8) + '%';
         
-        // 用來記錄這棟樓已經生成的窗戶位置 (垂直位置 %)
+        // --- 窗戶邏輯 (維持之前的田字窗 + 防重疊) ---
+        const windowCount = Math.floor(Math.random() * 3) + 2; 
         let occupiedPositions = []; 
 
         for (let j = 0; j < windowCount; j++) {
-            // 嘗試尋找不重疊的位置 (最多試 10 次，找不到就算了)
             let topPos = -1;
             let isValid = false;
             let attempts = 0;
 
             while (!isValid && attempts < 10) {
-                // 🎯 範圍限制：只在頂部 5% ~ 35% (上部 1/3)
-                let candidateTop = Math.random() * 30 + 5; 
-                
-                // 檢查是否跟現有窗戶太近 (距離小於 8%)
+                let candidateTop = Math.random() * 30 + 5; // 上部 1/3
                 let conflict = false;
                 for (let pos of occupiedPositions) {
-                    if (Math.abs(pos - candidateTop) < 8) {
+                    if (Math.abs(pos - candidateTop) < 10) { // 間距稍微拉大
                         conflict = true;
                         break;
                     }
                 }
-
                 if (!conflict) {
                     topPos = candidateTop;
                     isValid = true;
@@ -647,24 +644,19 @@ function initCity() {
                 attempts++;
             }
 
-            // 如果找到有效位置才生成
             if (isValid) {
                 const w = document.createElement('div');
                 w.classList.add('city-window');
                 
-                // 寬度 40% ~ 70%
-                w.style.width = (Math.random() * 30 + 40) + '%';
-                
-                // 水平居中稍微偏移 (15% ~ 45%)
-                w.style.left = (Math.random() * 30 + 15) + '%';
-                
+                // 窗戶寬度 (配合寬建築，稍微縮小比例，約 30~50%)
+                w.style.width = (Math.random() * 20 + 30) + '%';
+                w.style.left = (Math.random() * 40 + 15) + '%';
                 w.style.top = topPos + '%';
                 
                 b.appendChild(w);
-                occupiedPositions.push(topPos); // 記錄位置
+                occupiedPositions.push(topPos);
             }
         }
-
         cityContainer.appendChild(b);
     }
 }
@@ -742,6 +734,7 @@ function clearCityEffects() {
     // 移除殘留粒子
     document.querySelectorAll('.firework-particle').forEach(el => el.remove());
 }
+
 
 
 
