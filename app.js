@@ -800,7 +800,7 @@ function setMagicStage(stage) {
 function startMeteors() {
     if (meteorInterval) return;
     // 每 1.5 秒丟一顆流星 (不要太頻繁，避免卡頓)
-    meteorInterval = setInterval(createMeteor, 1500);
+    meteorInterval = setInterval(createMeteor, 1000);
 }
 
 function stopMeteors() {
@@ -835,6 +835,7 @@ function clearMagicEffects() {
     setMagicStage(0);
     stopMeteors();
 }
+
 
 
 
