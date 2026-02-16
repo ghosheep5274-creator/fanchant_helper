@@ -41,5 +41,11 @@ const songLibrary = {
         videoId: "9otLVWZWBwc",
         bpm: 63,
         file: "lyrics/idol.json"
+    },
+    "not_today": {
+        title: "💥 NOT TODAY",
+        videoId: "0HhX4J0_aik",
+        bpm: 55,
+        file: "lyrics/not_today.json"
     }
 };
