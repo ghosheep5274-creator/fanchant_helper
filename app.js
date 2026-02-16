@@ -596,7 +596,7 @@ let fireworkInterval = null;
 
 // 初始化城市 (造房子)
 function initCity() {
-    if (document.getElementById('bwl-city')) return; // 避免重複造城
+    if (document.getElementById('bwl-city')) return;
 
     const cityContainer = document.createElement('div');
     cityContainer.id = 'bwl-city';
@@ -607,14 +607,36 @@ function initCity() {
     document.body.insertBefore(cityContainer, document.body.firstChild);
     document.body.insertBefore(overlay, document.body.firstChild);
 
-    // 生成約 30~40 棟建築物填滿畫面
-    for (let i = 0; i < 40; i++) {
+    // 生成約 30 棟建築物
+    for (let i = 0; i < 30; i++) {
         const b = document.createElement('div');
         b.classList.add('building');
-        // 隨機高度 10% ~ 50%
-        b.style.height = (Math.random() * 40 + 10) + 'vh'; 
-        // 隨機寬度
-        b.style.width = (Math.random() * 4 + 3) + '%';
+        
+        // 隨機高度 15vh ~ 50vh (稍微拉高一點)
+        b.style.height = (Math.random() * 30 + 15) + 'vh'; 
+        // 隨機寬度 3% ~ 6%
+        b.style.width = (Math.random() * 7 + 3) + '%';
+        
+        // 🆕 隨機生成窗戶 (每棟 2 ~ 5 個)
+        const windowCount = Math.floor(Math.random() * 4) + 2; 
+
+        for (let j = 0; j < windowCount; j++) {
+            const w = document.createElement('div');
+            w.classList.add('city-window');
+            
+            // 隨機垂直位置 (10% ~ 90% 之間，避開樓頂和地板)
+            w.style.top = (Math.random() * 80 + 10) + '%';
+            
+            // 隨機水平位置 (稍微偏移一點，不要死板的置中)
+            // 讓窗戶在 10% ~ 50% 的範圍內浮動
+            w.style.left = (Math.random() * 40 + 10) + '%';
+            
+            // 隨機寬度 (有的窗戶寬，有的窄)
+            w.style.width = (Math.random() * 30 + 30) + '%';
+
+            b.appendChild(w);
+        }
+
         cityContainer.appendChild(b);
     }
 }
@@ -692,6 +714,7 @@ function clearCityEffects() {
     // 移除殘留粒子
     document.querySelectorAll('.firework-particle').forEach(el => el.remove());
 }
+
 
 
 
