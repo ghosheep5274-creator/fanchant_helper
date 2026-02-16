@@ -29,5 +29,11 @@ const songLibrary = {
         videoId: "dKHsskaD_4s",
         bpm: 60,
         file: "lyrics/boy_with_luv.json"
+    },
+    "magic_shop": {
+        title: "💖 Magic Shop",
+        videoId: "CP-Qh3KNTSQ",
+        bpm: 75,
+        file: "lyrics/magic_shop.json"
     }
 };
