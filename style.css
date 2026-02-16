@@ -679,13 +679,23 @@ body.city-stage-2 .city-window {
 #magic-sky {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    /* 深藍 -> 深紫 -> 黑色 的魔法漸層 */
     background: radial-gradient(circle at bottom, #2E004E 0%, #190028 40%, #000000 100%);
-    z-index: 1; /* 在最底層，但蓋住原本的黑底 */
+    z-index: 1; 
     opacity: 0;
-    transition: opacity 3s ease-in-out;
+    
+    /* 🔴 修改：原本是 3s，改成 1s 讓關閉更乾脆 */
+    transition: opacity 1s ease-in-out; 
+    
     pointer-events: none;
 }
+
+/* 🔴 新增：當開啟時，變回慢速淡入 (3s) */
+/* 這樣就會有：慢慢浮現(3s) -> 快速消失(1s) 的效果 */
+body.magic-stage-1 #magic-sky {
+    opacity: 1;
+    transition: opacity 3s ease-in-out;
+}
+
 
 /* 2. 星星 (預設不閃爍) */
 .magic-star {
@@ -740,5 +750,6 @@ body.magic-stage-1 #magic-sky { opacity: 1; }
 body.magic-stage-2 .magic-star {
     animation: twinkle 3s infinite ease-in-out alternate;
 }
+
 
 
