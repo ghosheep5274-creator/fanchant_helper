@@ -82,12 +82,12 @@ body {
     from { 
         left: 0; 
         transform: rotate(-20deg) scale(1); /* 向左傾斜 */
-        text-shadow: -5px 0 10px #AB46D2;   /* 左邊發光 */
+        text-shadow: -2px 0 5px #AB46D2;   /* 左邊發光 */
     }
     to { 
         left: 170px; /* 跑到右邊 (容器寬 200 - 愛心寬 30) */
         transform: rotate(20deg) scale(1.1); /* 向右傾斜 + 稍微變大 */
-        text-shadow: 5px 0 10px #AB46D2;     /* 右邊發光 */
+        text-shadow: 2px 0 5px #AB46D2;     /* 右邊發光 */
     }
 }
 
@@ -555,6 +555,7 @@ input:checked + .slider:before {
         opacity: 0;
     }
 }
+
 
 
 
