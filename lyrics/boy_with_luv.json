@@ -1,4 +1,5 @@
 [
+  { "time": 500, "text": "Waiting for beat...", "type": "wait" },
   { "time": 7953, "text": "Kim Nam-joon!", "type": "chant" },
   { "time": 8987, "text": "Kim Seok-jin!", "type": "chant" },
   { "time": 9944, "text": "Min Yoon-gi!", "type": "chant" },
@@ -62,5 +63,5 @@
   { "time": 220005, "text": "(BTS)-⑦", "type": "chant" },
   { "time": 221017, "text": "(BTS)-⑧", "type": "chant" },
   { "time": 226608, "text": "scream!", "type": "scream" },
-  { "time": 248075, "text": "end", "type": "chant" }
+  { "time": 248075, "text": "", "type": "end" }
 ]
