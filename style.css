@@ -710,7 +710,7 @@ body.city-stage-2 .city-window {
     height: 2px;
     background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%);
     opacity: 0;
-    transform: rotate(-45deg); /* 左上往右下飛 */
+    transform: rotate(45deg); /* 左上往右下飛 */
     animation: shoot 2s linear forwards;
     will-change: transform, opacity;
 }
@@ -718,14 +718,14 @@ body.city-stage-2 .city-window {
 /* 流星劃過動畫 */
 @keyframes shoot {
     0% {
-        transform: translate(0, 0) rotate(-45deg) scale(0.5);
+        transform: translate(0, 0) rotate(45deg) scale(0.5);
         opacity: 0;
     }
     10% { opacity: 1; } /* 瞬間變亮 */
     80% { opacity: 1; }
     100% {
         /* 往右下飛 800px */
-        transform: translate(800px, 800px) rotate(-45deg) scale(1);
+        transform: translate(800px, 800px) rotate(45deg) scale(1);
         opacity: 0;
     }
 }
@@ -740,4 +740,5 @@ body.magic-stage-1 #magic-sky { opacity: 1; }
 body.magic-stage-2 .magic-star {
     animation: twinkle 3s infinite ease-in-out alternate;
 }
+
 
