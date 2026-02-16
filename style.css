@@ -606,28 +606,34 @@ input:checked + .slider:before {
     background: linear-gradient(to bottom, rgba(10, 25, 80, 0.3) 0%, rgba(10, 25, 80, 0.95) 100%);
 }
 
-/* 3. 田字窗戶 (加寬十字線 + 半透明) */
+/* 1. 定義一個窗戶閃爍的動畫 */
+@keyframes broadway-flicker {
+  0%, 100% { opacity: 1; box-shadow: 0 0 5px #ffd700, 0 0 15px #ff8c00; }
+  50% { opacity: 0.6; box-shadow: 0 0 2px #ffd700, 0 0 5px #ff4500; }
+}
+
+/* 2. 更新 .city-window 樣式 */
 .city-window {
-    position: absolute;
-    background-color: transparent;
+  /* 保持您原有的定位與形狀設定 */
+  position: absolute; /* 假設您已有此設定 */
+  height: 2px; /* 假設您已有此設定，維持橫條狀 */
+  background-color: #ffd700; /* 明亮的金黃色 */
 
-    /* 橫條紋樣式維持不變 */
-    background-image: repeating-linear-gradient(
-        to bottom,
-        rgba(255, 235, 59, 0.8) 0px,
-        rgba(255, 235, 59, 0.8) 2px,
-        transparent 2px,
-        transparent 5px
-    );
+  /* 添加更豐富、偏暖橘色的光暈，營造百老匯氛圍 */
+  box-shadow: 0 0 5px #ffd700, 0 0 15px #ff8c00;
 
-    height: 14px;
-    border-radius: 1px;
-    opacity: 0;
-    transition: opacity 0.5s ease;
+  /* 應用閃爍動畫 */
+  animation: broadway-flicker 3s infinite alternate ease-in-out;
+}
 
-    /* 🔴 關鍵修改：加上柔和的黃色光暈 */
-    /* 這會讓窗戶看起來像發光體，而不是貼紙 */
-    box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+/* 3. 利用 nth-child 為不同窗戶製造隨機感，打破死板 */
+.city-window:nth-child(odd) {
+  animation-duration: 2.3s; /* 奇數窗戶閃爍速度不同 */
+  animation-delay: 0.5s; /* 加上延遲 */
+}
+.city-window:nth-child(3n) {
+  animation-duration: 3.7s; /* 每三個窗戶又有不同的速度 */
+  animation-delay: 1.2s;
 }
 
 /* --- 階段 1: 朦朧模式 --- */
@@ -667,6 +673,7 @@ body.city-stage-2 .city-window {
     0% { transform: translate(0, 0) scale(1); opacity: 1; }
     100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
+
 
 
 
