@@ -58,6 +58,7 @@ body {
     position: relative;
     display: flex;
     justify-content: center; /* 雖然有 absolute，但這個可以留著保底 */
+    z-index: 100 !important; /* 🌟 層級 100，絕對壓過城市的 2 */
 }
 
 #metronome-icon {
@@ -103,6 +104,8 @@ body {
     border: 1px solid #333;
     margin-bottom: 20px;
     width: fit-content;
+    position: relative;
+    z-index: 100 !important; /* 🌟 層級 100，絕對壓過城市的 2 */
 }
 
 /* --- 歌詞與特效 --- */
@@ -559,77 +562,67 @@ input:checked + .slider:before {
 /* ===========================
    💖 Boy With Luv 特效組：愛之城
 =========================== */
+/* style.css - 💖 Boy With Luv 特效組 (午夜藍調版) */
 
-/* 1. 城市天際線容器 */
+/* 1. 城市容器 */
 #bwl-city {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 30vh; /* 佔據畫面下半部 */
+    height: 45vh; /* 稍微拉高一點，讓建築更有氣勢 */
     display: flex;
-    align-items: flex-end; /* 建築物底部對齊 */
+    align-items: flex-end; /* 底部對齊 */
     justify-content: center;
-    z-index: 2; /* 在背景之上 */
-    opacity: 0; /* 預設隱藏 */
+    z-index: 2; /* 城市在背景層 (層級 2) */
+    opacity: 0;
     transition: opacity 2s ease;
     pointer-events: none;
 }
 
-/* 單棟建築物 (由 JS 生成) */
+/* 2. 單棟建築物 (深藍色深夜感) */
 .building {
-    background: #1a0b2e; /* 深紫色建築 */
-    margin: 0 2px;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-    /* 🔴 關鍵：設為 relative，讓裡面的窗戶可以定位 */
+    background: #05103b; /* 🌌 極深的午夜藍 */
+    margin: 0 1px; /* 間距縮小一點讓建築更密集 */
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
     position: relative; 
     transition: all 1s ease;
-    overflow: hidden; /* 防止窗戶跑到建築物外面 */
-}
-
-/* 🆕 單個小窗戶 (由 JS 生成) */
-.city-window {
-    position: absolute;
-    background-color: #ffeb3b; /* 亮黃色 */
-    width: 40%;  /* 窗戶寬度佔建築的 40% */
-    height: 4px; /* 窗戶高度固定 */
-    left: 30%;   /* 居中 */
-    border-radius: 1px;
-    opacity: 0;  /* 預設關燈 */
-    transition: opacity 0.5s ease, box-shadow 0.5s ease;
-}
-
-/* --- 階段 1: 朦朧模式 (窗戶微亮/不亮) --- */
-body.city-stage-1 #bwl-city { opacity: 0.7; filter: blur(3px); }
-body.city-stage-1 .building {
-    background: #1a0b2e;
-    box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
-}
-
-/* 朦朧時，窗戶只亮一點點，像遠處微光 */
-body.city-stage-1 .city-window {
-    opacity: 0.3; 
+    overflow: hidden;
+    /* 預設無光 */
     box-shadow: none;
 }
 
-/* --- 階段 2: 霓虹全開 (窗戶大亮!) --- */
+/* 3. 小窗戶 (亮黃色維持不變) */
+.city-window {
+    position: absolute;
+    background-color: #ffeb3b; /* 亮黃 */
+    height: 4px;
+    border-radius: 1px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    box-shadow: 0 0 5px #ffd700; /* 自帶一點光暈 */
+}
+
+/* --- 階段 1: 朦朧模式 --- */
+body.city-stage-1 #bwl-city { opacity: 0.8; filter: blur(2px); }
+body.city-stage-1 .building {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* 極淡的輪廓 */
+}
+body.city-stage-1 .city-window { opacity: 0.4; } /* 窗戶微亮 */
+
+/* --- 階段 2: 霓虹全開 (淺粉白光暈) --- */
 body.city-stage-2 #bwl-city { opacity: 1; filter: blur(0); }
 body.city-stage-2 .building {
-    background-color: #351356; /* 建築變亮紫色 */
-    /* 建築本體的霓虹光暈 */
+    background-color: #0a1a5c; /* 建築稍微變亮一點點的藍 */
+    
+    /* 🌸 淺粉白光暈 (Pale Pink/White Glow) */
     box-shadow: 
-        0 0 15px #ff00ff, 
-        0 0 30px #8A2BE2;
+        0 0 15px #ffe6f2,  /* 內層：極淺粉紅 */
+        0 0 30px #ffffff,  /* 中層：純白光核心 */
+        0 0 60px #ffb6c1;  /* 外層：柔和粉紅擴散 */
 }
-
-/* 霓虹模式時，窗戶全亮 + 發光 */
-body.city-stage-2 .city-window {
-    opacity: 1;
-    background-color: #fffacd; /* 檸檬黃，更亮 */
-    box-shadow: 0 0 5px #ffd700, 0 0 10px #ffff00; /* 強烈黃光暈 */
-}
-
+body.city-stage-2 .city-window { opacity: 1; box-shadow: 0 0 8px #fffacd; }
 /* --- 階段 3: 煙火粒子 --- */
 .firework-particle {
     position: absolute;
@@ -643,6 +636,7 @@ body.city-stage-2 .city-window {
     0% { transform: translate(0, 0) scale(1); opacity: 1; }
     100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
+
 
 
 
