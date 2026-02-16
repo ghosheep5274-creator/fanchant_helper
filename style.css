@@ -570,59 +570,74 @@ input:checked + .slider:before {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 45vh; /* 稍微拉高一點，讓建築更有氣勢 */
+    /* 配合房子變矮，容器高度也可以稍微降一點，避免遮擋太多 */
+    height: 40vh; 
     display: flex;
-    align-items: flex-end; /* 底部對齊 */
+    align-items: flex-end; 
     justify-content: center;
-    z-index: 2; /* 城市在背景層 (層級 2) */
+    z-index: 2; 
     opacity: 0;
     transition: opacity 2s ease;
     pointer-events: none;
 }
 
-/* 2. 單棟建築物 (深藍色深夜感) */
+/* 2. 單棟建築物 */
 .building {
-    background: #05103b; /* 🌌 極深的午夜藍 */
-    margin: 0 1px; /* 間距縮小一點讓建築更密集 */
+    background: #05103b; /* 深夜藍 */
+    margin: 0 1px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     position: relative; 
     transition: all 1s ease;
     overflow: hidden;
-    /* 預設無光 */
     box-shadow: none;
 }
 
-/* 3. 小窗戶 (亮黃色維持不變) */
+/* 3. 田字窗戶 (重點修改!) */
 .city-window {
     position: absolute;
-    background-color: #ffeb3b; /* 亮黃 */
-    height: 4px;
+    /* 基礎底色：亮黃 */
+    background-color: #ffeb3b;
+    
+    /* 透過 CSS 漸層畫出「田」字的中間分隔線 (顏色同建築物 #05103b) */
+    background-image: 
+        linear-gradient(to right, transparent 45%, #05103b 45%, #05103b 55%, transparent 55%), /* 垂直線 */
+        linear-gradient(to bottom, transparent 45%, #05103b 45%, #05103b 55%, transparent 55%); /* 水平線 */
+    
+    /* 高度固定，確保看起來像窗戶 (原本是 4px 太細，改成 14px 才有田字感) */
+    height: 14px; 
     border-radius: 1px;
     opacity: 0;
     transition: opacity 0.5s ease;
-    box-shadow: 0 0 5px #ffd700; /* 自帶一點光暈 */
+    /* 窗戶本身的光暈也調淡 */
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.6); 
 }
 
 /* --- 階段 1: 朦朧模式 --- */
 body.city-stage-1 #bwl-city { opacity: 0.8; filter: blur(2px); }
 body.city-stage-1 .building {
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* 極淡的輪廓 */
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); 
 }
-body.city-stage-1 .city-window { opacity: 0.4; } /* 窗戶微亮 */
+body.city-stage-1 .city-window { opacity: 0.3; }
 
-/* --- 階段 2: 霓虹全開 (淺粉白光暈) --- */
+/* --- 階段 2: 霓虹全開 (粉紫透明版) --- */
 body.city-stage-2 #bwl-city { opacity: 1; filter: blur(0); }
 body.city-stage-2 .building {
-    background-color: #0a1a5c; /* 建築稍微變亮一點點的藍 */
+    background-color: #0a1a5c; 
     
-    /* 🌸 淺粉白光暈 (Pale Pink/White Glow) */
+    /* 🌸 粉紫霓虹，但調高透明度 (0.3 ~ 0.4)，避免太亮影響文字 */
     box-shadow: 
-        0 0 15px #ffe6f2,  /* 內層：極淺粉紅 */
-        0 0 30px #ffffff,  /* 中層：純白光核心 */
-        0 0 60px #ffb6c1;  /* 外層：柔和粉紅擴散 */
+        0 0 15px rgba(138, 43, 226, 0.4),  /* 內層：紫羅蘭 (透明度 0.4) */
+        0 0 30px rgba(255, 20, 147, 0.3),  /* 中層：深粉紅 (透明度 0.3) */
+        0 0 50px rgba(255, 105, 180, 0.2); /* 外層：熱粉紅 (透明度 0.2) */
 }
-body.city-stage-2 .city-window { opacity: 1; box-shadow: 0 0 8px #fffacd; }
+body.city-stage-2 .city-window { 
+    opacity: 1; 
+    /* 窗戶光暈也稍微調柔和 */
+    box-shadow: 0 0 8px rgba(255, 250, 205, 0.8); 
+}
+
+
 /* --- 階段 3: 煙火粒子 --- */
 .firework-particle {
     position: absolute;
@@ -636,6 +651,7 @@ body.city-stage-2 .city-window { opacity: 1; box-shadow: 0 0 8px #fffacd; }
     0% { transform: translate(0, 0) scale(1); opacity: 1; }
     100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
+
 
 
 
