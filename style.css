@@ -582,51 +582,53 @@ input:checked + .slider:before {
     margin: 0 2px;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
-    /* 預設沒有窗戶光 */
-    box-shadow: none;
+    /* 🔴 關鍵：設為 relative，讓裡面的窗戶可以定位 */
+    position: relative; 
     transition: all 1s ease;
+    overflow: hidden; /* 防止窗戶跑到建築物外面 */
 }
 
-/* 2. 氛圍燈光罩 (Overlay) */
-#bwl-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 1;
-    opacity: 0;
-    transition: opacity 2s ease, background 2s ease;
-    pointer-events: none;
+/* 🆕 單個小窗戶 (由 JS 生成) */
+.city-window {
+    position: absolute;
+    background-color: #ffeb3b; /* 亮黃色 */
+    width: 40%;  /* 窗戶寬度佔建築的 40% */
+    height: 4px; /* 窗戶高度固定 */
+    left: 30%;   /* 居中 */
+    border-radius: 1px;
+    opacity: 0;  /* 預設關燈 */
+    transition: opacity 0.5s ease, box-shadow 0.5s ease;
 }
 
-/* --- 階段 1: 朦朧簡易城市 --- */
-body.city-stage-1 #bwl-city { opacity: 0.7; filter: blur(3px); } /* 建築有點模糊 */
+/* --- 階段 1: 朦朧模式 (窗戶微亮/不亮) --- */
+body.city-stage-1 #bwl-city { opacity: 0.7; filter: blur(3px); }
 body.city-stage-1 .building {
-     box-shadow: 0 0 10px rgba(255, 105, 180, 0.3); /* 淡淡粉紅輪廓光 */
+    background: #1a0b2e;
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
 }
 
-/* --- 階段 2: 清晰霓虹城市 (+亮亮黃窗戶!) --- */
-body.city-stage-2 #bwl-city { 
-    opacity: 1; 
-    filter: blur(0);
+/* 朦朧時，窗戶只亮一點點，像遠處微光 */
+body.city-stage-1 .city-window {
+    opacity: 0.3; 
+    box-shadow: none;
 }
+
+/* --- 階段 2: 霓虹全開 (窗戶大亮!) --- */
+body.city-stage-2 #bwl-city { opacity: 1; filter: blur(0); }
 body.city-stage-2 .building {
-    background-color: #351356; /* 建築本體稍微變亮一點的紫 */
-    
-    /* 🪟 窗戶魔法：利用重複漸層畫出黃色光帶 */
-    background-image: repeating-linear-gradient(
-        to bottom,
-        rgba(255, 223, 0, 0.9) 0px,  /* 亮黃光 起始 */
-        rgba(255, 223, 0, 0.9) 4px,  /* 亮黃光 結束 (窗戶高 4px) */
-        transparent 4px,             /* 牆壁隔間 起始 */
-        transparent 10px             /* 牆壁隔間 結束 (樓層間距 6px) */
-    );
-    
-    /* 強烈霓虹光暈 */
+    background-color: #351356; /* 建築變亮紫色 */
+    /* 建築本體的霓虹光暈 */
     box-shadow: 
-        0 0 10px #ffd700, /* 內圈加一點金黃光呼應窗戶 */
-        0 0 20px #ff00ff, /* 中圈紫紅霓虹 */
-        0 0 40px #8A2BE2; /* 外圈深紫霓虹 */
+        0 0 15px #ff00ff, 
+        0 0 30px #8A2BE2;
 }
 
+/* 霓虹模式時，窗戶全亮 + 發光 */
+body.city-stage-2 .city-window {
+    opacity: 1;
+    background-color: #fffacd; /* 檸檬黃，更亮 */
+    box-shadow: 0 0 5px #ffd700, 0 0 10px #ffff00; /* 強烈黃光暈 */
+}
 
 /* --- 階段 3: 煙火粒子 --- */
 .firework-particle {
@@ -641,6 +643,7 @@ body.city-stage-2 .building {
     0% { transform: translate(0, 0) scale(1); opacity: 1; }
     100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
+
 
 
 
