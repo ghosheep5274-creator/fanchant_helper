@@ -580,10 +580,10 @@ input:checked + .slider:before {
     pointer-events: none;
 }
 
-/* 2. 單棟建築物 (半透明深藍) */
+/* 2. 單棟建築物 (半透明深藍) + 垂直漸層 (頂部透明 -> 底部深色) */
 .building {
-    /* 🌌 深夜藍，但改成 60% 透明度，讓它融入背景 */
-    background: rgba(5, 16, 59, 0.6); 
+/* 從上面(透明度 0.2) 漸層到 下面(透明度 0.9) */
+    background: linear-gradient(to bottom, rgba(5, 16, 59, 0.2) 0%, rgba(5, 16, 59, 0.95) 100%);
     margin: 0 1px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
@@ -596,19 +596,21 @@ input:checked + .slider:before {
 /* 3. 田字窗戶 (加寬十字線 + 半透明) */
 .city-window {
     position: absolute;
-    /* 💡 窗戶亮光改為 60% 透明度的黃，不那麼刺眼 */
-    background-color: rgba(255, 235, 59, 0.6);
+/* ✅ 1. 窗戶光：改成暖色調 (Warm Light) 且透明度設為 0.5，柔和不搶眼 */
+    background-color: rgba(255, 230, 150, 0.5);
     
-    /* 十字線顏色同建築物，且線條加寬 (35% ~ 65% 區間為線條) */
+/* ✅ 2. 十字窗框：使用黑色半透明線條，看起來更像建築結構 */
+    /* 這裡設定線條佔 20% 寬度 (40%~60% 區間) */
     background-image: 
-        linear-gradient(to right, transparent 35%, rgba(5, 16, 59, 0.8) 35%, rgba(5, 16, 59, 0.8) 65%, transparent 65%),
-        linear-gradient(to bottom, transparent 35%, rgba(5, 16, 59, 0.8) 35%, rgba(5, 16, 59, 0.8) 65%, transparent 65%);
+        linear-gradient(to right, transparent 40%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.6) 60%, transparent 60%),
+        linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.6) 60%, transparent 60%);
     
     height: 14px; 
     border-radius: 1px;
     opacity: 0;
     transition: opacity 0.5s ease;
-    box-shadow: none; /* 預設無光暈 */
+/* ✅ 3. 增加內陰影 (Inset)：讓光看起來是從窗戶「裡面」透出來的，增加立體感 */
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
 /* --- 階段 1: 朦朧模式 --- */
@@ -648,6 +650,7 @@ body.city-stage-2 .city-window {
     0% { transform: translate(0, 0) scale(1); opacity: 1; }
     100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
+
 
 
 
