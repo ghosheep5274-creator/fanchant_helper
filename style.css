@@ -736,10 +736,8 @@ body.city-stage-2 .city-window {
 body.magic-stage-1 #magic-sky { opacity: 1; }
 
 /* Stage 2: 星星出現 + 閃爍 */
-body.magic-stage-2 .magic-star {
     /* 隨機閃爍：時間 2s~4s */
+body.magic-stage-2 .magic-star {
     animation: twinkle 3s infinite ease-in-out alternate;
 }
 
-/* Stage 3: 流星開始 (由 JS 控制生成) */
-/* CSS 這裡不需要特別寫，JS 會負責丟流星出來 */
