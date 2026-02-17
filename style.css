@@ -779,16 +779,14 @@ body.magic-stage-2 .magic-star {
    🧈 Butter Melt 特效：融化奶油 (最終修正版)
 =========================== */
 
-/* style.css - 🧈 Butter 特效 (大波浪活潑版) */
+/* style.css - 🧈 Butter 特效 (圓潤高光質感版) */
 
-/* 0. 隱藏的 SVG 濾鏡容器 */
 .svg-filter-container {
     position: absolute;
     width: 0; height: 0;
     overflow: hidden;
 }
 
-/* 1. 奶油特效外層容器 */
 #butter-wrapper {
     position: fixed;
     top: 0; left: 0;
@@ -798,75 +796,78 @@ body.magic-stage-2 .magic-star {
     opacity: 0;
     transition: opacity 0.5s;
     
-    /* 🟡 核心魔法： */
-    /* 1. Gooey 濾鏡：融合 */
-    /* 2. Drop-shadow：給整層奶油加一個像專輯封面的黑色陰影，增加 Pop Art 感 */
-    filter: url('#gooey-cartoon') drop-shadow(2px 4px 0px rgba(0, 0, 0, 0.2));
+    /* 🟡 核心魔法：只用 Gooey 濾鏡融合 */
+    /* 移除之前的 drop-shadow，改用內高光來表現立體感 */
+    filter: url('#gooey-glossy');
 }
 
-/* 2. 頂部實心層 (天花板，稍微薄一點，讓波浪露出來) */
+/* 通用奶油材質 (高光關鍵) */
+.butter-texture {
+    background: #FFD700;
+    /* ✨ 加入柔和的白色內高光，製造奶油油脂感 */
+    /* 關鍵：模糊半徑 (25px) 要大，才能在濾鏡下融合 */
+    box-shadow: inset 0 5px 25px rgba(255, 255, 255, 0.7);
+}
+
+/* 2. 頂部實心層 */
 .butter-solid-top {
     position: absolute;
     top: 0; left: 0;
     width: 100%;
-    height: 8vh; 
-    background: #FFD700; 
+    /* 稍微加厚，確保蓋住波浪的上半部 */
+    height: 12vh; 
 }
 
-/* 3. 大波浪塊 (模擬宣傳照下層的厚實質感) */
+/* 3. 大波浪塊 (修正轉角與質感) */
 .butter-thick-wave {
     position: absolute;
-    background: #FFD700;
-    top: -5vh; /* 藏上面一點 */
-    /* 關鍵：使用不規則圓角，模擬液體張力 */
-    border-radius: 40% 60% 35% 65% / 40% 50% 50% 60%;
-    /* 讓波浪稍微會動，看起來是活的 */
-    animation: wave-breath 4s ease-in-out infinite alternate;
+    /* 藏在實心層後面，只露出下半部的圓弧 */
+    top: 2vh; 
+    /* 使用較圓潤的形狀，減少尖角 */
+    border-radius: 50%;
+    /* 讓波浪輕微浮動 */
+    animation: wave-breath 5s ease-in-out infinite alternate;
 }
 
-/* 4. 活潑的水滴 (Lively Drip) */
+/* 4. 真實水滴 (Teardrop) */
 .butter-drop {
     position: absolute;
-    background: #FFD700;
-    border-radius: 50%;
+    /* 💧 核心形狀：淚滴型 (上尖下圓) */
+    border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
     transform-origin: center top;
-    /* 結合兩個動畫：落下 + 左右搖擺 (更活潑) */
-    animation: livelyDrop linear infinite;
+    /* 加入針對水滴的高光 */
+    box-shadow: inset 5px 5px 15px rgba(255, 255, 255, 0.8);
+    animation: glossyDrop linear infinite;
 }
 
 /* --- 動畫區 --- */
 
-/* 波浪呼吸：讓頂部奶油看起來在緩慢流動 */
 @keyframes wave-breath {
     from { transform: translateY(0) scale(1); }
-    to { transform: translateY(10px) scale(1.05, 0.95); }
+    to { transform: translateY(5px) scale(1.02, 0.98); }
 }
 
-/* 活潑滴落：拉長 -> 變形 -> 彈性落下 */
-@keyframes livelyDrop {
+/* 💧 水滴落下動畫 */
+@keyframes glossyDrop {
     0% {
-        transform: translateY(0) scaleX(1.3) scaleY(0.4); /* 扁平積蓄 */
+        /* 初始：藏在波浪裡，壓扁 */
+        transform: translateY(0) scaleX(1.2) scaleY(0.3);
         opacity: 1;
     }
-    15% {
-        transform: translateY(2vh) scaleX(1.1) scaleY(0.9); /* 探頭 */
+    20% {
+        /* 探頭：開始變形成水滴 */
+        transform: translateY(3vh) scaleX(1) scaleY(1);
     }
-    40% {
-        /* 拉絲階段：變細長 */
-        transform: translateY(12vh) scaleX(0.7) scaleY(1.5); 
-    }
-    60% {
-        /* 斷裂前夕：最長 */
-        transform: translateY(25vh) scaleX(0.6) scaleY(1.8);
+    50% {
+        /* 拉長牽絲 */
+        transform: translateY(25vh) scaleX(0.7) scaleY(1.5);
     }
     100% {
-        /* 掉到底部 */
-        transform: translateY(110vh) scaleX(0.8) scaleY(1.2); /* 變回水滴狀 */
+        /* 落下：保持水滴狀 */
+        transform: translateY(110vh) scaleX(0.6) scaleY(1.2);
         opacity: 0;
     }
 }
 
-/* 開關 */
 body.butter-on #butter-wrapper { opacity: 1; }
-
 
