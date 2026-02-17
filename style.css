@@ -779,14 +779,16 @@ body.magic-stage-2 .magic-star {
    🧈 Butter Melt 特效：融化奶油 (最終修正版)
 =========================== */
 
-/* style.css - 🧈 Butter 特效 (圓潤高光質感版) */
+/* style.css - 🧈 Butter 終極液態版 */
 
+/* 隱藏的 SVG 定義區 */
 .svg-filter-container {
     position: absolute;
     width: 0; height: 0;
     overflow: hidden;
 }
 
+/* 奶油特效容器 */
 #butter-wrapper {
     position: fixed;
     top: 0; left: 0;
@@ -796,78 +798,68 @@ body.magic-stage-2 .magic-star {
     opacity: 0;
     transition: opacity 0.5s;
     
-    /* 🟡 核心魔法：只用 Gooey 濾鏡融合 */
-    /* 移除之前的 drop-shadow，改用內高光來表現立體感 */
-    filter: url('#gooey-glossy');
+    /* 🟡 核心魔法：應用「液態光澤濾鏡」 */
+    /* 這會處理：1.融合黏稠 2.表面高光 3.立體感 */
+    filter: url('#butter-gloss-filter');
 }
 
-/* 通用奶油材質 (高光關鍵) */
-.butter-texture {
-    background: #FFD700;
-    /* ✨ 加入柔和的白色內高光，製造奶油油脂感 */
-    /* 關鍵：模糊半徑 (25px) 要大，才能在濾鏡下融合 */
-    box-shadow: inset 0 5px 25px rgba(255, 255, 255, 0.7);
-}
-
-/* 2. 頂部實心層 */
-.butter-solid-top {
+/* 頂部波浪 (改用 SVG 繪製，保證圓潤無接縫) */
+.butter-svg-wave {
     position: absolute;
-    top: 0; left: 0;
+    top: -10vh; /* 稍微往上藏，讓波浪自然垂下 */
+    left: 0;
     width: 100%;
-    /* 稍微加厚，確保蓋住波浪的上半部 */
-    height: 12vh; 
+    height: 45vh; /* 波浪高度 */
+    
+    /* 讓整個波浪像呼吸一樣微微浮動 */
+    animation: wave-float 6s ease-in-out infinite alternate;
 }
 
-/* 3. 大波浪塊 (修正轉角與質感) */
-.butter-thick-wave {
-    position: absolute;
-    /* 藏在實心層後面，只露出下半部的圓弧 */
-    top: 2vh; 
-    /* 使用較圓潤的形狀，減少尖角 */
-    border-radius: 50%;
-    /* 讓波浪輕微浮動 */
-    animation: wave-breath 5s ease-in-out infinite alternate;
-}
-
-/* 4. 真實水滴 (Teardrop) */
+/* 水滴 (維持淚滴形狀，但移除所有 CSS 陰影) */
 .butter-drop {
     position: absolute;
-    /* 💧 核心形狀：淚滴型 (上尖下圓) */
-    border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
-    transform-origin: center top;
-    /* 加入針對水滴的高光 */
-    box-shadow: inset 5px 5px 15px rgba(255, 255, 255, 0.8);
-    animation: glossyDrop linear infinite;
+    background: #FFD700; /* 必須跟 SVG fill 顏色完全一樣 */
+    
+    /* 💧 完美淚滴形 */
+    border-radius: 0 50% 50% 50%;
+    transform: rotate(45deg); /* 轉正 */
+    
+    animation: liquidDrop linear infinite;
 }
 
 /* --- 動畫區 --- */
 
-@keyframes wave-breath {
-    from { transform: translateY(0) scale(1); }
-    to { transform: translateY(5px) scale(1.02, 0.98); }
+/* 波浪呼吸 */
+@keyframes wave-float {
+    0% { transform: translateY(0) scaleY(1); }
+    100% { transform: translateY(15px) scaleY(1.05); }
 }
 
-/* 💧 水滴落下動畫 */
-@keyframes glossyDrop {
+/* 水滴落下 (物理牽絲感) */
+/* 這裡的 transform 比較複雜，因為原本有 rotate(45deg) */
+@keyframes liquidDrop {
     0% {
-        /* 初始：藏在波浪裡，壓扁 */
-        transform: translateY(0) scaleX(1.2) scaleY(0.3);
+        /* 藏在波浪裡 */
+        top: 5vh;
+        transform: rotate(45deg) scale(0);
         opacity: 1;
     }
     20% {
-        /* 探頭：開始變形成水滴 */
-        transform: translateY(3vh) scaleX(1) scaleY(1);
+        /* 探頭 */
+        top: 15vh;
+        transform: rotate(45deg) scale(0.8);
     }
     50% {
-        /* 拉長牽絲 */
-        transform: translateY(25vh) scaleX(0.7) scaleY(1.5);
+        /* 拉長 (模擬牽絲) */
+        top: 25vh;
+        transform: rotate(45deg) scale(0.6, 1.4); 
     }
     100% {
-        /* 落下：保持水滴狀 */
-        transform: translateY(110vh) scaleX(0.6) scaleY(1.2);
+        /* 掉到底部 */
+        top: 110vh;
+        transform: rotate(45deg) scale(0.8); 
         opacity: 0;
     }
 }
 
 body.butter-on #butter-wrapper { opacity: 1; }
-
