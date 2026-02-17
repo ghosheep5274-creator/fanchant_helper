@@ -879,6 +879,54 @@ body.butter-on #butter-wrapper { opacity: 1; }
 
 
 
+/* style.css - 🧨 Dynamite 繽紛特效 */
+
+/* 背景 Disco 濾鏡 */
+#dynamite-bg-layer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1; /* 在最底層 */
+    opacity: 0.3; /* 不要太亮，才不會遮住歌詞 */
+    transition: background 2s ease;
+}
+
+/* 繽紛碎紙花容器 */
+#dynamite-confetti-layer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1; /* 在歌詞下方 */
+    pointer-events: none;
+}
+
+/* 亮片樣式 */
+.confetti {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: #f00;
+    animation: confetti-fall linear forwards;
+}
+
+/* 亮片形狀：方形、圓形、星星 */
+.confetti.square { border-radius: 0; }
+.confetti.circle { border-radius: 50%; }
+.confetti.star { 
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); 
+}
+
+/* 落下動畫 */
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-10vh) rotate(0deg) translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(110vh) rotate(720deg) translateX(50px);
+        opacity: 0;
+    }
+}
 
 
 
