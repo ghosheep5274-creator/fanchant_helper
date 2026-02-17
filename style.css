@@ -777,67 +777,75 @@ body.magic-stage-2 .magic-star {
 
 
 /* ===========================
-   🧈 Butter Melt 特效：融化奶油
+   🧈 Butter Melt 特效：融化奶油 (修正版)
 =========================== */
 
-/* 0. 隱藏的 SVG 濾鏡容器 (在 JS 中動態加入) */
+/* 0. 隱藏的 SVG 濾鏡容器 (維持不變) */
 .svg-filter-container {
     position: absolute;
     width: 0; height: 0;
     overflow: hidden;
 }
 
-/* 1. 奶油層容器 (上半部) */
-#butter-melt-layer {
+/* 1. 奶油特效外層容器 (透明！只負責濾鏡) */
+#butter-wrapper {
     position: fixed;
     top: -100%; /* 一開始藏在上面 */
     left: 0;
     width: 100%;
-    height: 60%; /* 佔據畫面約上半部 */
-    z-index: 1; /* 在背景之上，歌詞之下 */
+    height: 100%; /* 蓋住全螢幕，讓油可以滴到底 */
+    z-index: 1; 
     pointer-events: none;
     opacity: 0;
-    transition: top 1.5s ease-in-out, opacity 0.8s;
-
-    /* 🟡 核心魔法：應用 Gooey 濾鏡 */
+    transition: top 1s ease-out, opacity 0.5s;
+    
+    /* 🟡 核心魔法：黏稠濾鏡 */
     filter: url('#gooey-butter-filter');
-    /* 基礎奶油色背景，帶一點透明度 */
-    background-color: rgba(255, 225, 53, 0.85); 
 }
 
-/* 2. 奶油滴 (製造融化往下流的效果) */
-.butter-blob {
+/* 2. 靜態的奶油頂部 (負責顯示上半部的黃色) */
+.butter-top-bar {
     position: absolute;
     top: 0;
-    /* 使用與容器相同的奶油色 */
-    background-color: rgba(255, 225, 53, 0.9);
-    border-radius: 0 0 50% 50%; /* 下方圓潤 */
-    animation: meltDown infinite ease-in;
+    left: 0;
+    width: 100%;
+    height: 35vh; /* 佔據畫面上方 35% */
+    background: #FFD700; /* 濃郁的奶油黃 */
 }
 
-/* 融化動畫 */
-@keyframes meltDown {
+/* 3. 動態奶油滴 (往下流) */
+.butter-blob {
+    position: absolute;
+    top: 25vh; /* 從頂部條內部開始長出來 */
+    background: #FFD700; /* 跟頂部同色，濾鏡會把它們黏起來 */
+    border-radius: 50%;
+    transform-origin: center top;
+    animation: dripDrop infinite ease-in;
+}
+
+/* 滴落動畫：從黏住 -> 拉長 -> 斷開 -> 落下 */
+@keyframes dripDrop {
     0% {
-        transform: translateY(0) scaleX(1) scaleY(0.5);
+        transform: translateY(0) scale(1, 1);
     }
-    40% {
-        /* 變長並往下流 */
-        transform: translateY(20vh) scaleX(0.8) scaleY(2); 
+    30% {
+        /* 變長，準備斷開 */
+        transform: translateY(10vh) scale(0.9, 1.2);
+    }
+    60% {
+        /* 斷開落下 */
+        transform: translateY(30vh) scale(0.6, 1.5);
     }
     100% {
-        /* 滴落到最下面並變細消失 */
-        transform: translateY(70vh) scaleX(0.2) scaleY(0.2);
-        opacity: 0;
+        /* 掉到底部 */
+        transform: translateY(80vh) scale(0.3, 0.3);
+        opacity: 0; 
     }
 }
 
 /* --- 開關控制 --- */
-/* 當 body 加上 butter-on class 時，特效出現 */
-body.butter-on #butter-melt-layer {
-    top: 0; /* 滑下來蓋住上半部 */
+body.butter-on #butter-wrapper {
+    top: 0;
     opacity: 1;
 }
-
-
-
 
