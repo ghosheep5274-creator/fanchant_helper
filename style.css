@@ -775,10 +775,11 @@ body.magic-stage-2 .magic-star {
     animation: twinkle 3s infinite ease-in-out alternate;
 }
 
-
 /* ===========================
    🧈 Butter Melt 特效：融化奶油 (最終修正版)
 =========================== */
+
+/* style.css - Butter 特效修正 (油亮版) */
 
 /* 0. 隱藏的 SVG 濾鏡容器 */
 .svg-filter-container {
@@ -787,76 +788,88 @@ body.magic-stage-2 .magic-star {
     overflow: hidden;
 }
 
-/* 1. 奶油特效外層容器 (透明) */
+/* 1. 奶油特效外層容器 */
 #butter-wrapper {
     position: fixed;
-    top: 0; 
-    left: 0;
-    width: 100%;
-    height: 100%; 
-    z-index: 1; 
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.5s;
-    
-    /* 🟡 核心魔法：黏稠濾鏡 */
-    /* 這裡的 filter 負責把所有黃色的圓球黏在一起 */
+    /* 核心魔法：黏稠濾鏡 */
     filter: url('#gooey-butter-filter');
 }
 
-/* 2. 靜態的頂部 (不再是長方形，而是由很多圓形組成的波浪) */
-.butter-static-drip {
+/* 🔴 通用奶油材質 (頂部 + 水滴都用這個) */
+.butter-texture {
     position: absolute;
-    top: -15vh; /* 往上藏一點，讓圓弧露出來 */
-    background: #FFD700; /* 純色！不能有透明度 */
-    border-radius: 50%;
+    /* 改用更鮮豔的奶油黃 (原本 #FFD700 有點暗) */
+    background: #FFDD00; 
+    
+    /* ✨ 關鍵修改：加入內發光 (Highlight) 製造油亮感 */
+    /* 左上角亮白光，右下角深黃陰影 -> 製造立體液體感 */
+    box-shadow: 
+        inset 10px 10px 20px rgba(255, 255, 255, 0.6), 
+        inset -5px -10px 10px rgba(218, 165, 32, 0.3);
 }
 
-/* 3. 動態落下的奶油滴 (真實液體版) */
-.butter-drop {
+/* 2. 靜態頂部 (波浪源頭) */
+.butter-static-drip {
+    /* 繼承上面的材質 */
+    background: #FFDD00;
+    box-shadow: inset 10px 10px 20px rgba(255, 255, 255, 0.6);
+    
+    top: -10vh; /* 往上藏 */
+    border-radius: 50%;
     position: absolute;
-    background: #FFD700; 
+}
+
+/* 3. 動態落下的奶油滴 */
+.butter-drop {
+    background: #FFDD00;
+    /* 水滴也加上小一點的高光 */
+    box-shadow: inset 5px 5px 10px rgba(255, 255, 255, 0.7);
     
-    /* 🔴 關鍵 1：初始形狀改成「水滴型」，而不是正圓 */
+    position: absolute;
+    /* 水滴形狀 */
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    
-    /* 設定變形原點在頂部 (這樣拉長時才會像從上面流下來) */
-    transform-origin: center top; 
-    
-    /* 改用 ease-in，模擬重力加速 */
+    transform-origin: center top;
     animation: butterFall linear infinite;
 }
 
-/* 🔴 關鍵 2：真實液體滴落物理動畫 */
+/* 4. 🔴 新增：頂部填滿層 (避免波浪上方有空隙) */
+.butter-fill-block {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 15vh; /* 填滿頂部 */
+    background: #FFDD00;
+    /* 讓它也有光澤 */
+    box-shadow: inset 0 -10px 20px rgba(218, 165, 32, 0.2);
+}
+
+/* 落下動畫 */
 @keyframes butterFall {
     0% {
-        /* 初始：藏在頂部，壓扁 (還在積聚) */
-        transform: translateY(0) scaleX(1.5) scaleY(0.5);
+        transform: translateY(0) scaleX(1.2) scaleY(0.6); /* 初始扁平 */
         opacity: 1;
     }
-    20% {
-        /* 開始流出：恢復正常大小 */
-        transform: translateY(2vh) scaleX(1) scaleY(1);
+    10% {
+        transform: translateY(5vh) scaleX(1) scaleY(1);
     }
     40% {
-        /* 重力拉扯：變細、變長 (牽絲感) */
-        transform: translateY(10vh) scaleX(0.7) scaleY(1.8);
-    }
-    60% {
-        /* 斷裂前夕：拉到最長 */
-        transform: translateY(20vh) scaleX(0.5) scaleY(2.2);
+        /* 拉長牽絲 */
+        transform: translateY(20vh) scaleX(0.7) scaleY(1.5);
     }
     100% {
-        /* 快速落下：變回水滴狀，加速消失 */
-        transform: translateY(110vh) scaleX(0.8) scaleY(1.2);
+        /* 掉到底部 */
+        transform: translateY(110vh) scaleX(0.6) scaleY(1.2);
         opacity: 0;
     }
 }
 
-
-/* --- 開關控制 --- */
-body.butter-on #butter-wrapper {
-    opacity: 1;
-}
+/* 開關 */
+body.butter-on #butter-wrapper { opacity: 1; }
 
 
