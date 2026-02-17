@@ -779,9 +779,9 @@ body.magic-stage-2 .magic-star {
    🧈 Butter Melt 特效：融化奶油 (最終修正版)
 =========================== */
 
-/* style.css - 🧈 Butter 手機完美相容版 (CSS 原生高光) */
+/* style.css - 🧈 Butter 最終修正版 (3滴 + 波浪置頂) */
 
-/* 隱藏 SVG 定義 (雖然這次用不到濾鏡了，但保留結構以免報錯) */
+/* 隱藏 SVG 定義 */
 .svg-filter-container {
     position: absolute;
     width: 0; height: 0;
@@ -794,49 +794,49 @@ body.magic-stage-2 .magic-star {
     top: 0; left: 0;
     width: 100%; height: 100%;
     
-    /* 🔴 層級設為 1，確保在按鈕之下、背景之上 */
+    /* 確保不擋按鈕 */
     z-index: 1; 
     
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.5s;
     
-    /* 🔴 關鍵：只用 CSS 的 drop-shadow 做外框，不用 SVG 濾鏡 */
-    /* 這會給所有奶油物件加上一層深黃色描邊，手機完全支援 */
+    /* 深黃色描邊 (漫畫感) */
     filter: drop-shadow(2px 4px 0px rgba(180, 130, 0, 0.4));
 }
 
-/* 頂部波浪 SVG */
+/* 頂部波浪 SVG (🔴 圖層置頂) */
 .butter-svg-wave {
     position: absolute;
-    top: -2vh;
+    top: -2vh; 
     left: 0;
     width: 100%;
     height: 35vh;
     animation: melt-breathe 5s ease-in-out infinite alternate;
     transform-origin: top center;
     
-    /* 🔴 修改波浪光澤位置 */
-    /* 原本是 (0 5px) 正下方 */
-    /* 改成 (4px 5px) 右下方，並稍微調亮一點，讓光線方向一致 */
+    /* 🔴 關鍵修改：Z-Index 設高，確保蓋住水滴 */
+    z-index: 10; 
+
+    /* 波浪本身的光澤 */
     filter: drop-shadow(4px 5px 0 rgba(255,255,255,0.3));
 }
 
-/* 💧 水滴 (卡通淚滴狀 + 原生 CSS 高光) */
+/* 💧 水滴 (🔴 圖層置底) */
 .butter-drop {
     position: absolute;
     background: #FFD700;
     
-    /* 形狀：上尖下圓 (維持不變) */
+    /* 確保在波浪後面 */
+    z-index: 5; 
+
+    /* 形狀：上尖下圓 */
     border-radius: 50% 50% 50% 50% / 70% 70% 35% 35%;
     
     transform-origin: center top;
     animation: verticalDrop linear infinite;
 
-    /* 🔴 核心修改：改變高光位置到右下角 */
-    /* 原本是 inset 5px 5px (左上) */
-    /* 改成 inset -4px -4px (負數代表從右下角往內縮) */
-    /* 稍微增加一點模糊度 (2px) 讓它看起來更像反光 */
+    /* 漫畫高光 (右下角) */
     box-shadow: inset -4px -4px 2px rgba(255, 255, 255, 0.7);
 }
 
@@ -849,29 +849,30 @@ body.magic-stage-2 .magic-star {
 
 @keyframes verticalDrop {
     0% {
-        top: 5vh;
-        /* 稍微壓扁，藏在波浪裡 */
+        /* 起點：藏在波浪後面 */
+        top: 10vh; 
         transform: scaleX(1.2) scaleY(0.4); 
         opacity: 1;
     }
     15% {
-        top: 12vh;
-        /* 探頭，恢復形狀 */
+        /* 探頭：露出來 */
+        top: 18vh;
         transform: scale(1); 
     }
     40% {
-        top: 22vh;
-        /* 重力拉長 */
+        /* 拉長 */
+        top: 28vh;
         transform: scaleX(0.8) scaleY(1.4); 
     }
     100% {
-        top: 110vh;
         /* 落下 */
+        top: 110vh;
         transform: scaleX(0.9) scaleY(1.1);
         opacity: 0;
     }
 }
 
 body.butter-on #butter-wrapper { opacity: 1; }
+
 
 
