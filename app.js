@@ -844,15 +844,30 @@ function clearMagicEffects() {
 // 🧈 Butter Melt Engine
 // ===========================
 
-// app.js - [區域 I] 特效引擎
-
 function initButterMelt() {
     if (document.getElementById('butter-wrapper')) return;
+
+    // 1. 注入「手機專用」輕量化濾鏡
+    const svgFilter = `
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filter-container">
+      <defs>
+        <filter id="butter-mobile-filter" color-interpolation-filters="sRGB"
+                x="-50%" y="-50%" width="200%" height="200%">
+          
+          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+          
+          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="gooey" />
+
+          <feComposite in="SourceGraphic" in2="gooey" operator="atop"/>
+        </filter>
+      </defs>
+    </svg>`;
+    document.body.insertAdjacentHTML('beforeend', svgFilter);
 
     const wrapper = document.createElement('div');
     wrapper.id = 'butter-wrapper';
 
-    // 1. 建立頂部波浪 (包含漸層定義)
+    // 2. 建立頂部波浪
     const topWave = document.createElement('div');
     topWave.innerHTML = `
         <svg class="butter-svg-wave" viewBox="0 0 1440 320" preserveAspectRatio="none">
@@ -872,12 +887,9 @@ function initButterMelt() {
     `;
     wrapper.appendChild(topWave);
 
-    // 2. 建立水滴 (固定 3 顆)
+    // 3. 建立水滴 (固定 3 顆)
     const dropPositions = [20, 50, 80]; 
-    
-    dropPositions.forEach(pos => {
-        createDrop(wrapper, pos);
-    });
+    dropPositions.forEach(pos => { createDrop(wrapper, pos); });
 
     document.body.insertBefore(wrapper, document.body.firstChild);
 }
@@ -886,15 +898,12 @@ function createDrop(wrapper, leftPos) {
     const drop = document.createElement('div');
     drop.classList.add('butter-drop');
     
-    // 🔴 尺寸縮小 50% (18px ~ 28px)
+    // 尺寸維持縮小版 (18~28px)
     const size = Math.random() * 10 + 18;
-    
     drop.style.width = size + 'px';
     drop.style.height = (size * 1.3) + 'px';
-
     drop.style.left = leftPos + '%';
     
-    // 時間稍微錯開，保持優雅的慢速
     const duration = Math.random() * 1.5 + 3.5; 
     drop.style.animationDuration = duration + 's';
     drop.style.animationDelay = (Math.random() * -4) + 's';
@@ -924,6 +933,7 @@ function clearButterEffects() {
     stopButter();
     // 如果需要完全移除元素可以寫在這裡，但通常只需要 stop 即可
 }
+
 
 
 
