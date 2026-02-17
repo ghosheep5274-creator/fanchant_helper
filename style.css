@@ -779,7 +779,7 @@ body.magic-stage-2 .magic-star {
    🧈 Butter Melt 特效：融化奶油 (最終修正版)
 =========================== */
 
-/* style.css - 🧈 Butter 終極液態版 */
+/* style.css - 🧈 Butter 最終修正版 (垂直水滴 + 貝茲融化波浪) */
 
 /* 隱藏的 SVG 定義區 */
 .svg-filter-container {
@@ -798,68 +798,78 @@ body.magic-stage-2 .magic-star {
     opacity: 0;
     transition: opacity 0.5s;
     
-    /* 🟡 核心魔法：應用「液態光澤濾鏡」 */
-    /* 這會處理：1.融合黏稠 2.表面高光 3.立體感 */
-    filter: url('#butter-gloss-filter');
+    /* 應用液態光澤濾鏡 */
+    /* drop-shadow 用來增加一點點厚度感，但不要太深 */
+    filter: url('#butter-gloss-filter') drop-shadow(0 5px 0px rgba(218, 165, 32, 0.3));
 }
 
-/* 頂部波浪 (改用 SVG 繪製，保證圓潤無接縫) */
+/* 頂部波浪 SVG */
 .butter-svg-wave {
     position: absolute;
-    top: -10vh; /* 稍微往上藏，讓波浪自然垂下 */
+    top: -2vh; /* 稍微往上，蓋住頂部 */
     left: 0;
     width: 100%;
-    height: 45vh; /* 波浪高度 */
+    /* 高度設為變數或固定比例，讓它有垂墜感 */
+    height: 35vh; 
     
-    /* 讓整個波浪像呼吸一樣微微浮動 */
-    animation: wave-float 6s ease-in-out infinite alternate;
+    /* 讓波浪像液體一樣微微變形 */
+    animation: melt-breathe 4s ease-in-out infinite alternate;
+    transform-origin: top center;
 }
 
-/* 水滴 (維持淚滴形狀，但移除所有 CSS 陰影) */
+/* 💧 水滴 (修正為垂直落下) */
 .butter-drop {
     position: absolute;
-    background: #FFD700; /* 必須跟 SVG fill 顏色完全一樣 */
+    background: #FFD700; /* 必須跟 SVG fill 顏色一致 */
     
-    /* 💧 完美淚滴形 */
-    border-radius: 0 50% 50% 50%;
-    transform: rotate(45deg); /* 轉正 */
+    /* 🔴 關鍵修正：不旋轉！用圓角做成水滴狀 */
+    /* 上面尖(小半徑)，下面圓(大半徑) */
+    border-radius: 45% 45% 50% 50% / 60% 60% 40% 40%;
     
-    animation: liquidDrop linear infinite;
+    /* 變形原點設在頂部，拉長時才自然 */
+    transform-origin: center top;
+    
+    animation: verticalDrop linear infinite;
 }
 
 /* --- 動畫區 --- */
 
-/* 波浪呼吸 */
-@keyframes wave-float {
-    0% { transform: translateY(0) scaleY(1); }
-    100% { transform: translateY(15px) scaleY(1.05); }
+/* 波浪呼吸：模擬液體張力 */
+@keyframes melt-breathe {
+    0% { transform: scaleY(1); }
+    100% { transform: scaleY(1.05); }
 }
 
-/* 水滴落下 (物理牽絲感) */
-/* 這裡的 transform 比較複雜，因為原本有 rotate(45deg) */
-@keyframes liquidDrop {
+/* 垂直落下動畫 (無旋轉) */
+@keyframes verticalDrop {
     0% {
-        /* 藏在波浪裡 */
+        /* 起點：藏在波浪裡 */
         top: 5vh;
-        transform: rotate(45deg) scale(0);
+        transform: scaleX(1.2) scaleY(0.5); /* 扁平 */
         opacity: 1;
     }
-    20% {
-        /* 探頭 */
+    15% {
+        /* 探頭：變成圓球 */
         top: 15vh;
-        transform: rotate(45deg) scale(0.8);
+        transform: scale(1);
     }
-    50% {
-        /* 拉長 (模擬牽絲) */
+    40% {
+        /* 重力拉扯：變長條 */
         top: 25vh;
-        transform: rotate(45deg) scale(0.6, 1.4); 
+        transform: scaleX(0.7) scaleY(1.5); 
+    }
+    60% {
+        /* 斷裂落下：更長 */
+        top: 40vh;
+        transform: scaleX(0.6) scaleY(1.8);
     }
     100% {
-        /* 掉到底部 */
+        /* 掉到底部消失 */
         top: 110vh;
-        transform: rotate(45deg) scale(0.8); 
+        transform: scaleX(0.8) scaleY(1.2); /* 恢復一點水滴狀 */
         opacity: 0;
     }
 }
 
 body.butter-on #butter-wrapper { opacity: 1; }
+
