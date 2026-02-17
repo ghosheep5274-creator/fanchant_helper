@@ -796,7 +796,7 @@ body.magic-stage-2 .magic-star {
     height: 100%; /* 或者用 height: 100dvh; 確保手機網址列不會擋住 */
     
     /* 🔴 修正 1: 提高層級，避免被手機播放器蓋住 */
-    z-index: 9999; 
+    z-index: 1; 
     
     pointer-events: none;
     opacity: 0;
@@ -878,6 +878,7 @@ body.magic-stage-2 .magic-star {
 }
 
 body.butter-on #butter-wrapper { opacity: 1; }
+
 
 
 
