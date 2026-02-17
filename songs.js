@@ -47,5 +47,11 @@ const songLibrary = {
         videoId: "0HhX4J0_aik",
         bpm: 55,
         file: "lyrics/not_today.json"
+        },
+    "dynamite": {
+        title: "💥 Dynamite",
+        videoId: "bOcedPW4-7k",
+        bpm: 57,
+        file: "lyrics/dynamite.json"
     }
 };
