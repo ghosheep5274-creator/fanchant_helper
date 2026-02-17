@@ -779,7 +779,7 @@ body.magic-stage-2 .magic-star {
    🧈 Butter Melt 特效：融化奶油 (最終修正版)
 =========================== */
 
-/* style.css - 🧈 Butter 最終融合版 (漸層+物理+小水滴) */
+/* style.css - 🧈 Butter 手機流暢黏稠版 (犧牲描邊換取動畫) */
 
 /* 隱藏 SVG 定義 */
 .svg-filter-container { display: none; }
@@ -789,55 +789,55 @@ body.magic-stage-2 .magic-star {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    
-    /* 確保不擋按鈕 */
     z-index: 1; 
-    
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.5s;
     
-    /* 深色描邊 (漫畫貼紙感)，手機支援良好 */
-    filter: drop-shadow(2px 3px 0px rgba(180, 130, 0, 0.3));
+    /* 🔴 關鍵修正：移除 drop-shadow！只保留 SVG 濾鏡 */
+    /* 手機無法同時處理濾鏡+陰影，移除陰影後「黏稠感」就會回來了 */
+    -webkit-filter: url('#butter-mobile-filter');
+    filter: url('#butter-mobile-filter');
+    
+    /* 效能優化 */
+    will-change: filter;
 }
 
-/* 頂部波浪 (圖層置頂) */
+/* 頂部波浪 */
 .butter-svg-wave {
     position: absolute;
-    top: -2vh; 
-    left: 0;
-    width: 100%; 
-    height: 35vh;
-    
-    /* 使用 SVG 內的漸層填充 */
+    top: -2vh; left: 0;
+    width: 100%; height: 35vh;
     fill: url(#butter-gradient); 
     
-    /* 🔴 關鍵：蓋在水滴上面 */
+    /* 蓋在水滴上面 */
     z-index: 10; 
 
     animation: melt-breathe 4s ease-in-out infinite alternate;
     transform-origin: top center;
+    
+    /* 🔴 強制手機 GPU 運算 */
+    transform: translate3d(0,0,0);
 }
 
-/* 💧 水滴 (圖層置底 + 縮小版) */
+/* 💧 水滴 */
 .butter-drop {
     position: absolute;
-    
-    /* 使用 CSS 漸層，模擬液體立體感 */
     background: linear-gradient(180deg, #FFD700 0%, #FFC107 100%);
-    
-    /* 🔴 關鍵：藏在波浪後面 */
-    z-index: 5; 
+    z-index: 5; /* 藏在波浪後 */
 
     /* 形狀：淚滴型 */
     border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
     transform-origin: center top;
 
-    /* 物理動畫：先慢(黏住) -> 後快(斷裂落下) */
-    animation: stickyDrop cubic-bezier(0.7, 0, 0.2, 1) infinite;
+    /* 物理動畫：極致的黏滯感 */
+    animation: stickySqueeze cubic-bezier(0.7, 0, 0.2, 1) infinite;
 
-    /* 右下角高光 (配合縮小尺寸，設定為 -2px) */
-    box-shadow: inset -2px -2px 1px rgba(255, 255, 255, 0.8);
+    /* 右下角高光 */
+    box-shadow: inset -2px -2px 1px rgba(255, 255, 255, 0.9);
+    
+    /* 🔴 強制手機 GPU 運算 */
+    transform: translate3d(0,0,0);
 }
 
 /* --- 動畫區 --- */
@@ -846,25 +846,27 @@ body.magic-stage-2 .magic-star {
     100% { transform: scaleY(1.05); }
 }
 
-@keyframes stickyDrop {
+/* 🔴 全新：擠壓落下動畫 */
+@keyframes stickySqueeze {
     0% {
         /* 起點：藏在波浪後面 */
         top: 8vh;
-        transform: scaleX(1.1) scaleY(0.5); /* 扁平積蓄 */
+        /* 極度壓扁：模擬還在波浪裡積蓄力量 */
+        transform: scaleX(1.8) scaleY(0.2); 
         opacity: 1;
     }
-    30% {
-        /* 探頭 */
-        top: 15vh;
-        transform: scale(1); 
+    20% {
+        /* 開始流出：還是扁的，黏在波浪邊緣 */
+        top: 12vh;
+        transform: scaleX(1.4) scaleY(0.6);
     }
-    60% {
-        /* 重力拉扯最長的一瞬間 */
-        top: 35vh;
-        transform: scaleX(0.7) scaleY(1.6); 
+    45% {
+        /* 瞬間拉長：重力大於黏力，像起司一樣拉絲 */
+        top: 25vh;
+        transform: scaleX(0.6) scaleY(1.8); 
     }
     100% {
-        /* 快速落下 */
+        /* 斷裂落下 */
         top: 110vh;
         transform: scaleX(0.9) scaleY(1.1);
         opacity: 0;
