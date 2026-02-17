@@ -822,7 +822,7 @@ body.magic-stage-2 .magic-star {
     filter: drop-shadow(4px 5px 0 rgba(255,255,255,0.3));
 }
 
-/* 💧 水滴 (🔴 圖層置底) */
+/* 💧 水滴 (縮小版) */
 .butter-drop {
     position: absolute;
     background: #FFD700;
@@ -830,14 +830,15 @@ body.magic-stage-2 .magic-star {
     /* 確保在波浪後面 */
     z-index: 5; 
 
-    /* 形狀：上尖下圓 */
+    /* 形狀維持不變 */
     border-radius: 50% 50% 50% 50% / 70% 70% 35% 35%;
     
     transform-origin: center top;
     animation: verticalDrop linear infinite;
 
-    /* 漫畫高光 (右下角) */
-    box-shadow: inset -4px -4px 2px rgba(255, 255, 255, 0.7);
+    /* 🔴 關鍵修改：配合縮小的尺寸，高光也要縮小 */
+    /* 改成 inset -2px -2px */
+    box-shadow: inset -2px -2px 1px rgba(255, 255, 255, 0.8);
 }
 
 /* --- 動畫區 --- */
@@ -873,6 +874,7 @@ body.magic-stage-2 .magic-star {
 }
 
 body.butter-on #butter-wrapper { opacity: 1; }
+
 
 
 
