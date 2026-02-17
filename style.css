@@ -809,32 +809,35 @@ body.magic-stage-2 .magic-star {
 /* 頂部波浪 SVG */
 .butter-svg-wave {
     position: absolute;
-    top: -2vh; 
+    top: -2vh;
     left: 0;
     width: 100%;
     height: 35vh;
     animation: melt-breathe 5s ease-in-out infinite alternate;
     transform-origin: top center;
     
-    /* 🔴 給波浪本身加一點光澤 (選用) */
-    filter: drop-shadow(0 5px 0 rgba(255,255,255,0.2));
+    /* 🔴 修改波浪光澤位置 */
+    /* 原本是 (0 5px) 正下方 */
+    /* 改成 (4px 5px) 右下方，並稍微調亮一點，讓光線方向一致 */
+    filter: drop-shadow(4px 5px 0 rgba(255,255,255,0.3));
 }
 
 /* 💧 水滴 (卡通淚滴狀 + 原生 CSS 高光) */
 .butter-drop {
     position: absolute;
-    background: #FFD700; 
+    background: #FFD700;
     
-    /* 形狀：上尖下圓 */
+    /* 形狀：上尖下圓 (維持不變) */
     border-radius: 50% 50% 50% 50% / 70% 70% 35% 35%;
     
     transform-origin: center top;
     animation: verticalDrop linear infinite;
 
-    /* 🔴 核心魔法：用內陰影畫出「漫畫高光」 */
-    /* inset x y blur color */
-    /* 白色半透明光澤，偏移在左上角 */
-    box-shadow: inset 5px 5px 1px rgba(255, 255, 255, 0.6);
+    /* 🔴 核心修改：改變高光位置到右下角 */
+    /* 原本是 inset 5px 5px (左上) */
+    /* 改成 inset -4px -4px (負數代表從右下角往內縮) */
+    /* 稍微增加一點模糊度 (2px) 讓它看起來更像反光 */
+    box-shadow: inset -4px -4px 2px rgba(255, 255, 255, 0.7);
 }
 
 /* --- 動畫區 --- */
@@ -870,4 +873,5 @@ body.magic-stage-2 .magic-star {
 }
 
 body.butter-on #butter-wrapper { opacity: 1; }
+
 
