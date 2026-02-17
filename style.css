@@ -779,7 +779,7 @@ body.magic-stage-2 .magic-star {
    🧈 Butter Melt 特效：融化奶油 (最終修正版)
 =========================== */
 
-/* style.css - 🧈 Butter 特效 (卡通波浪版) */
+/* style.css - 🧈 Butter 特效 (大波浪活潑版) */
 
 /* 0. 隱藏的 SVG 濾鏡容器 */
 .svg-filter-container {
@@ -799,62 +799,70 @@ body.magic-stage-2 .magic-star {
     transition: opacity 0.5s;
     
     /* 🟡 核心魔法： */
-    /* 1. goo 濾鏡：把圓球黏成液體 */
-    /* 2. drop-shadow：給整塊奶油加一個微微的深色邊框，增加卡通貼紙感 */
-    filter: url('#gooey-cartoon') drop-shadow(0 4px 0px rgba(218, 165, 32, 0.5));
+    /* 1. Gooey 濾鏡：融合 */
+    /* 2. Drop-shadow：給整層奶油加一個像專輯封面的黑色陰影，增加 Pop Art 感 */
+    filter: url('#gooey-cartoon') drop-shadow(2px 4px 0px rgba(0, 0, 0, 0.2));
 }
 
-/* 2. 頂部實心層 (天花板) */
-/* 這塊負責擋住水滴的生成點，讓它們看起來是從裡面流出來的 */
+/* 2. 頂部實心層 (天花板，稍微薄一點，讓波浪露出來) */
 .butter-solid-top {
     position: absolute;
     top: 0; left: 0;
     width: 100%;
-    height: 12vh; /* 厚度 */
-    background: #FFD700; /* 純色！BTS Butter 黃 */
+    height: 8vh; 
+    background: #FFD700; 
 }
 
-/* 3. 靜態波浪圓球 (負責製造可愛的波浪邊緣) */
-.butter-wave-base {
+/* 3. 大波浪塊 (模擬宣傳照下層的厚實質感) */
+.butter-thick-wave {
     position: absolute;
     background: #FFD700;
-    border-radius: 50%;
-    top: 5vh; /* 故意跟實心層重疊 */
+    top: -5vh; /* 藏上面一點 */
+    /* 關鍵：使用不規則圓角，模擬液體張力 */
+    border-radius: 40% 60% 35% 65% / 40% 50% 50% 60%;
+    /* 讓波浪稍微會動，看起來是活的 */
+    animation: wave-breath 4s ease-in-out infinite alternate;
 }
 
-/* 4. 動態落下水滴 */
+/* 4. 活潑的水滴 (Lively Drip) */
 .butter-drop {
     position: absolute;
     background: #FFD700;
     border-radius: 50%;
-    /* 設為變形起點在頂部 */
-    transform-origin: center top; 
-    animation: cartoonDrip linear infinite;
+    transform-origin: center top;
+    /* 結合兩個動畫：落下 + 左右搖擺 (更活潑) */
+    animation: livelyDrop linear infinite;
 }
 
-/* 卡通感的滴落動畫 */
-/* 重點：起點要藏在波浪裡 (scaleY: 0)，然後拉長 */
-@keyframes cartoonDrip {
+/* --- 動畫區 --- */
+
+/* 波浪呼吸：讓頂部奶油看起來在緩慢流動 */
+@keyframes wave-breath {
+    from { transform: translateY(0) scale(1); }
+    to { transform: translateY(10px) scale(1.05, 0.95); }
+}
+
+/* 活潑滴落：拉長 -> 變形 -> 彈性落下 */
+@keyframes livelyDrop {
     0% {
-        transform: translateY(0) scaleX(1.2) scaleY(0); 
+        transform: translateY(0) scaleX(1.3) scaleY(0.4); /* 扁平積蓄 */
         opacity: 1;
     }
-    20% {
-        /* 探頭出來 */
-        transform: translateY(2vh) scaleX(1) scaleY(1);
+    15% {
+        transform: translateY(2vh) scaleX(1.1) scaleY(0.9); /* 探頭 */
     }
-    45% {
-        /* 拉長牽絲 (Cartoon Stretch) */
-        transform: translateY(15vh) scaleX(0.7) scaleY(1.8);
+    40% {
+        /* 拉絲階段：變細長 */
+        transform: translateY(12vh) scaleX(0.7) scaleY(1.5); 
     }
     60% {
-        /* 斷裂落下 */
-        transform: translateY(30vh) scaleX(0.5) scaleY(1.2);
+        /* 斷裂前夕：最長 */
+        transform: translateY(25vh) scaleX(0.6) scaleY(1.8);
     }
     100% {
         /* 掉到底部 */
-        transform: translateY(110vh) scaleX(0.5) scaleY(0.5);
-        opacity: 0; /* 這裡設為 1 也可以，如果要它一直保持黃色 */
+        transform: translateY(110vh) scaleX(0.8) scaleY(1.2); /* 變回水滴狀 */
+        opacity: 0;
     }
 }
 
