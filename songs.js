@@ -53,5 +53,11 @@ const songLibrary = {
         videoId: "bOcedPW4-7k",
         bpm: 57,
         file: "lyrics/dynamite.json"
+     },
+    "butter": {
+        title: "🧈 Butter",
+        videoId: "OeEWAgUhlbI",
+        bpm: 55,
+        file: "lyrics/butter.json"
     }
 };
