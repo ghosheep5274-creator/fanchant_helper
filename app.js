@@ -847,13 +847,13 @@ function clearMagicEffects() {
 function initButterMelt() {
     if (document.getElementById('butter-wrapper')) return;
 
-    // 1. 注入 SVG Gooey 濾鏡 (調整了參數，讓黏稠度更強，消除細胞邊界)
+    // 1. 注入 SVG Gooey 濾鏡 (🔴 修正版：加強模糊與對比，讓它們黏得更緊)
     const svgFilter = `
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filter-container">
       <defs>
         <filter id="gooey-butter-filter">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
-          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="gooey" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
+          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 25 -11" result="gooey" />
           <feComposite in="SourceGraphic" in2="gooey" operator="atop"/>
         </filter>
       </defs>
@@ -864,48 +864,45 @@ function initButterMelt() {
     const wrapper = document.createElement('div');
     wrapper.id = 'butter-wrapper';
 
-    // 3. 【關鍵修改】建立「波浪頂部」
-    // 用 20 個大圓球塞滿頂部，製造不規則的融化邊緣，取代死板長方形
+    // 3. 建立「波浪頂部」 (🔴 修正版：加大尺寸與重疊度)
     const screenWidth = window.innerWidth;
-    const blobCount = Math.floor(screenWidth / 40); // 根據螢幕寬度決定數量
+    // 減少數量，但讓每個變得更大，比較不容易出現縫隙
+    const blobCount = Math.floor(screenWidth / 50); 
 
-    for (let i = 0; i < blobCount + 5; i++) {
+    for (let i = 0; i < blobCount + 2; i++) {
         const staticDrip = document.createElement('div');
         staticDrip.classList.add('butter-static-drip');
         
-        // 隨機大小 (80px ~ 180px) -> 大一點才像整塊奶油
-        const size = Math.random() * 100 + 80;
+        // 🔴 變大：120px ~ 200px (原本是 80~180)
+        const size = Math.random() * 80 + 120;
         staticDrip.style.width = size + 'px';
         staticDrip.style.height = size + 'px';
         
-        // 位置：讓它們互相重疊，鋪滿頂部
-        staticDrip.style.left = (i * 40 - 50) + 'px'; 
-        // 高度隨機抖動，製造波浪感
-        staticDrip.style.top = (Math.random() * 40 - 80) + 'px'; 
+        // 🔴 更密集的排列：確保重疊
+        staticDrip.style.left = (i * 50 - 60) + 'px'; 
+        staticDrip.style.top = (Math.random() * 40 - 100) + 'px'; // 藏高一點
 
         wrapper.appendChild(staticDrip);
     }
 
-    // 4. 建立「落下水滴」 (從波浪中流出來)
+    // 4. 建立「落下水滴」
     for (let i = 0; i < 15; i++) {
         const drop = document.createElement('div');
         drop.classList.add('butter-drop');
         
-        // 隨機大小 (20px ~ 60px)
-        const size = Math.random() * 40 + 20;
+        // 隨機寬度 (稍微變窄一點，看起來比較流線)
+        const size = Math.random() * 30 + 20;
         drop.style.width = size + 'px';
-        drop.style.height = size + 'px';
+        drop.style.height = (size * 1.2) + 'px'; // 高度比寬度大，預設就是長形
 
-        // 隨機水平位置
         drop.style.left = Math.random() * 100 + '%';
-        // 起始點：藏在靜態波浪裡面
-        drop.style.top = '-50px';
+        // 起始點：要在頂部波浪的內部
+        drop.style.top = '-40px';
         
-        // 動畫時間
-        const duration = Math.random() * 3 + 3; // 3~6秒
+        // 動畫時間：差異化大一點
+        const duration = Math.random() * 2 + 3; // 3~5秒
         drop.style.animationDuration = duration + 's';
         
-        // 隨機延遲
         drop.style.animationDelay = (Math.random() * -5) + 's';
 
         wrapper.appendChild(drop);
@@ -913,6 +910,7 @@ function initButterMelt() {
 
     document.body.insertBefore(wrapper, document.body.firstChild);
 }
+
 
 // 開始特效
 function startButter() {
@@ -935,6 +933,7 @@ function clearButterEffects() {
     stopButter();
     // 如果需要完全移除元素可以寫在這裡，但通常只需要 stop 即可
 }
+
 
 
 
