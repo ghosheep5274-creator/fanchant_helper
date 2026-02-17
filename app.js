@@ -845,49 +845,58 @@ function clearMagicEffects() {
 // ===========================
 
 function initButterMelt() {
-    if (document.getElementById('butter-melt-layer')) return;
+    // 防止重複生成
+    if (document.getElementById('butter-wrapper')) return;
 
-    // 1. 注入 SVG Gooey 濾鏡定義 (這段看起來很可怕，但照抄就好，它是黏稠效果的核心)
+    // 1. 注入 SVG Gooey 濾鏡 (維持不變，這是黏稠的核心)
     const svgFilter = `
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filter-container">
       <defs>
         <filter id="gooey-butter-filter">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
-          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" result="gooey" />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="gooey" />
           <feComposite in="SourceGraphic" in2="gooey" operator="atop"/>
         </filter>
       </defs>
     </svg>`;
     document.body.insertAdjacentHTML('beforeend', svgFilter);
 
+    // 2. 建立新的結構
+    // Wrapper (透明)
+    const wrapper = document.createElement('div');
+    wrapper.id = 'butter-wrapper';
 
-    // 2. 建立奶油層容器
-    const butterLayer = document.createElement('div');
-    butterLayer.id = 'butter-melt-layer';
+    // Top Bar (黃色本體)
+    const topBar = document.createElement('div');
+    topBar.classList.add('butter-top-bar');
+    wrapper.appendChild(topBar);
 
-    // 3. 產生 8~12 個隨機的奶油滴
-    const blobCount = Math.floor(Math.random() * 5) + 8; 
-    for (let i = 0; i < blobCount; i++) {
+    // 3. 產生 15 個奶油滴 (Blobs)
+    for (let i = 0; i < 15; i++) {
         const blob = document.createElement('div');
         blob.classList.add('butter-blob');
         
-        // 隨機寬度 (5% ~ 15%)
-        blob.style.width = (Math.random() * 10 + 5) + '%';
+        // 隨機寬度 (胖胖的看起來比較像奶油)
+        const size = Math.random() * 80 + 40; // 40px ~ 120px
+        blob.style.width = size + 'px';
+        blob.style.height = size + 'px'; // 初始是圓形
+
         // 隨機水平位置
-        blob.style.left = (Math.random() * 90) + '%';
+        blob.style.left = (Math.random() * 100) + '%';
         
-        // 隨機動畫時間 (4s ~ 7s) - 慢一點看起來比較濃稠
-        const duration = Math.random() * 3 + 4;
+        // 隨機動畫時間 (快慢不一)
+        const duration = Math.random() * 2 + 3; // 3s ~ 5s
         blob.style.animationDuration = duration + 's';
         
-        // 隨機延遲，錯開滴落時間
-        blob.style.animationDelay = (Math.random() * -duration) + 's';
+        // 隨機延遲 (讓它們不要同時掉下來)
+        blob.style.animationDelay = (Math.random() * -5) + 's';
 
-        butterLayer.appendChild(blob);
+        wrapper.appendChild(blob);
     }
 
-    document.body.insertBefore(butterLayer, document.body.firstChild);
+    document.body.insertBefore(wrapper, document.body.firstChild);
 }
+
 
 // 開始特效
 function startButter() {
@@ -910,6 +919,7 @@ function clearButterEffects() {
     stopButter();
     // 如果需要完全移除元素可以寫在這裡，但通常只需要 stop 即可
 }
+
 
 
 
