@@ -849,26 +849,21 @@ function clearMagicEffects() {
 function initButterMelt() {
     if (document.getElementById('butter-wrapper')) return;
 
-    // 1. 注入「亮面液態」濾鏡
+    // 1. 注入全新「漫畫硬邊高光」濾鏡
     const svgFilter = `
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filter-container">
       <defs>
-        <filter id="butter-gloss-filter" color-interpolation-filters="sRGB">
+        <filter id="butter-cartoon-filter" color-interpolation-filters="sRGB">
           <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-          
-          <feColorMatrix in="blur" mode="matrix" values="
-            1 0 0 0 0  
-            0 1 0 0 0  
-            0 0 1 0 0  
-            0 0 0 19 -9" result="gooey" />
-          
-          <feSpecularLighting in="blur" surfaceScale="6" specularConstant="1.2" specularExponent="20" lighting-color="#ffffff" result="specular">
-            <fePointLight x="200" y="-100" z="300" />
+          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9" result="gooey" />
+
+          <feSpecularLighting in="gooey" surfaceScale="5" specularConstant="1" specularExponent="15" lighting-color="#ffffff" result="specular-soft">
+            <feDistantLight azimuth="225" elevation="45" />
           </feSpecularLighting>
-          
-          <feComposite in="specular" in2="gooey" operator="in" result="specular-cut" />
-          
-          <feComposite in="specular-cut" in2="gooey" operator="over" />
+
+          <feColorMatrix in="specular-soft" mode="matrix" values="
+            0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 18 -8" result="specular-hard" /> <feComposite in="specular-hard" in2="gooey" operator="in" result="final-highlight" />
+          <feComposite in="final-highlight" in2="gooey" operator="over" />
         </filter>
       </defs>
     </svg>`;
@@ -877,8 +872,7 @@ function initButterMelt() {
     const wrapper = document.createElement('div');
     wrapper.id = 'butter-wrapper';
 
-    // 2. 建立頂部波浪 (使用新的不規則貝茲曲線)
-    // 這條曲線模擬了自然融化的邊緣，有三個主要的融化垂點
+    // 2. 建立頂部波浪 (維持貝茲曲線)
     const topWave = document.createElement('div');
     topWave.innerHTML = `
         <svg class="butter-svg-wave" viewBox="0 0 1440 320" preserveAspectRatio="none">
@@ -892,21 +886,38 @@ function initButterMelt() {
     `;
     wrapper.appendChild(topWave);
 
-    // 3. 建立水滴 (垂直落下)
-    // 配合波浪的垂點位置生成水滴，看起來更真實
-    const dropPositions = [15, 38, 60, 85]; // 對應波浪的垂下位置 (%)
+    // 3. 建立水滴 (🔴 減少數量)
+    // 只保留 3 個主要位置
+    const dropPositions = [20, 50, 85]; 
     
-    // 生成主要水滴
     dropPositions.forEach(pos => {
         createDrop(wrapper, pos);
     });
     
-    // 生成隨機小水滴
-    for(let i=0; i<4; i++) {
+    // 只增加 2 個隨機小水滴
+    for(let i=0; i<2; i++) {
         createDrop(wrapper, Math.random() * 90 + 5);
     }
 
     document.body.insertBefore(wrapper, document.body.firstChild);
+}
+
+function createDrop(wrapper, leftPos) {
+    const drop = document.createElement('div');
+    drop.classList.add('butter-drop');
+    
+    // 大小：35px ~ 55px
+    const size = Math.random() * 20 + 35;
+    drop.style.width = size + 'px';
+    drop.style.height = (size * 1.3) + 'px';
+
+    drop.style.left = leftPos + '%';
+    
+    const duration = Math.random() * 1.5 + 3; // 3s ~ 4.5s
+    drop.style.animationDuration = duration + 's';
+    drop.style.animationDelay = (Math.random() * -4) + 's';
+
+    wrapper.appendChild(drop);
 }
 
 function createDrop(wrapper, leftPos) {
@@ -949,6 +960,7 @@ function clearButterEffects() {
     stopButter();
     // 如果需要完全移除元素可以寫在這裡，但通常只需要 stop 即可
 }
+
 
 
 
