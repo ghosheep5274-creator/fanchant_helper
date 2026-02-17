@@ -847,76 +847,73 @@ function clearMagicEffects() {
 function initButterMelt() {
     if (document.getElementById('butter-wrapper')) return;
 
-    // 1. 注入 SVG 濾鏡 (保持清晰邊緣)
+    // 1. 注入升級版 SVG 濾鏡 (解決圓圈高光問題)
+    // 🔴 關鍵調整：
+    // stdDeviation="15"：大幅增加模糊度 (之前是10)，讓高光融合。
+    // values="... 25 -11"：大幅增加 Alpha 對比度，把糊掉的邊緣切回來變銳利。
     const svgFilter = `
     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" class="svg-filter-container">
       <defs>
-        <filter id="gooey-cartoon">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+        <filter id="gooey-glossy">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
           <feColorMatrix in="blur" mode="matrix" values="
             1 0 0 0 0  
             0 1 0 0 0  
             0 0 1 0 0  
-            0 0 0 19 -9" result="gooey" />
+            0 0 0 25 -11" result="gooey" />
           <feComposite in="SourceGraphic" in2="gooey" operator="atop"/>
         </filter>
       </defs>
     </svg>`;
     document.body.insertAdjacentHTML('beforeend', svgFilter);
 
-    // 2. 建立容器
     const wrapper = document.createElement('div');
     wrapper.id = 'butter-wrapper';
 
-    // 3. 建立頂部實心層
+    // 2. 建立頂部實心層 (加上材質類別)
     const solidTop = document.createElement('div');
-    solidTop.classList.add('butter-solid-top');
+    solidTop.classList.add('butter-solid-top', 'butter-texture');
     wrapper.appendChild(solidTop);
 
-    // 4. 建立「厚實大波浪」 (模仿 800M 宣傳照下層)
+    // 3. 建立大波浪 (加上材質類別)
     const screenWidth = window.innerWidth;
-    // 數量變少，但尺寸變很大
-    const waveCount = Math.floor(screenWidth / 120) + 2; 
+    // 使用較大的圓形，重疊產生波浪
+    const waveCount = Math.floor(screenWidth / 100) + 3; 
 
     for (let i = 0; i < waveCount; i++) {
         const wave = document.createElement('div');
-        wave.classList.add('butter-thick-wave');
+        // 同時加入形狀和材質 class
+        wave.classList.add('butter-thick-wave', 'butter-texture');
         
-        // 🔴 變大！寬度 160px ~ 240px (製造大波浪感)
-        const width = Math.random() * 80 + 160;
-        const height = Math.random() * 60 + 120; // 高度也要夠厚
+        // 大小約 150px ~ 220px
+        const size = Math.random() * 70 + 150;
+        wave.style.width = size + 'px';
+        wave.style.height = size + 'px';
         
-        wave.style.width = width + 'px';
-        wave.style.height = height + 'px';
+        // 緊密排列
+        wave.style.left = (i * 100 - 150) + 'px'; 
+        // 高度微調
+        wave.style.top = (Math.random() * 30 - 10) + 'px'; 
         
-        // 重疊排列 (間距比寬度小，確保融合)
-        wave.style.left = (i * 120 - 80) + 'px'; 
-        // 高度隨機，讓波浪有高低起伏
-        wave.style.top = (Math.random() * 40 - 20) + 'px'; 
-        
-        // 隨機延遲呼吸動畫
-        wave.style.animationDelay = (Math.random() * -2) + 's';
-
+        wave.style.animationDelay = (Math.random() * -3) + 's';
         wrapper.appendChild(wave);
     }
 
-    // 5. 建立「活潑水滴」 (數量適中)
-    for (let i = 0; i < 6; i++) {
+    // 4. 建立水滴 (加上材質類別)
+    for (let i = 0; i < 7; i++) {
         const drop = document.createElement('div');
-        drop.classList.add('butter-drop');
+        // 同時加入水滴和材質 class
+        drop.classList.add('butter-drop', 'butter-texture');
         
-        // 大小：30px ~ 55px
-        const size = Math.random() * 25 + 30;
+        // 大小適中
+        const size = Math.random() * 25 + 35;
         drop.style.width = size + 'px';
-        drop.style.height = (size * 1.1) + 'px'; 
+        drop.style.height = (size * 1.3) + 'px'; // 預設就是長形水滴狀
 
-        // 隨機位置
         drop.style.left = Math.random() * 90 + 5 + '%';
-        // 起始點：藏在大波浪裡
-        drop.style.top = '10vh'; 
+        drop.style.top = '5vh'; // 從波浪裡長出來
         
-        // 動畫時間
-        const duration = Math.random() * 2 + 2.5; // 2.5~4.5s
+        const duration = Math.random() * 2 + 3;
         drop.style.animationDuration = duration + 's';
         drop.style.animationDelay = (Math.random() * -5) + 's';
 
@@ -947,6 +944,7 @@ function clearButterEffects() {
     stopButter();
     // 如果需要完全移除元素可以寫在這裡，但通常只需要 stop 即可
 }
+
 
 
 
