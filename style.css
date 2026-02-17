@@ -779,7 +779,7 @@ body.magic-stage-2 .magic-star {
    🧈 Butter Melt 特效：融化奶油 (最終修正版)
 =========================== */
 
-/* style.css - Butter 特效 (乾淨融合版) */
+/* style.css - 🧈 Butter 特效 (極致物理牽絲版) */
 
 /* 0. 隱藏的 SVG 濾鏡容器 */
 .svg-filter-container {
@@ -798,59 +798,116 @@ body.magic-stage-2 .magic-star {
     opacity: 0;
     transition: opacity 0.5s;
     
-    /* 🟡 核心魔法： */
-    /* 1. 用 url filter 把黃色圓球黏成液體 */
-    /* 2. 用 drop-shadow 給「整塊液體」加陰影，而不是給「每個圓球」加 */
-    filter: url('#gooey-butter-filter') drop-shadow(0 10px 10px rgba(0,0,0,0.3));
+    /* 核心魔法：黏稠濾鏡 */
+    /* 這次參數有特調，讓光澤可以透出來，但形狀又能融合 */
+    filter: url('#gooey-butter-filter');
 }
 
-/* 2. 頂部填滿層 (確保最上面是平的，不會有波浪縫隙) */
-.butter-fill-block {
+/* 2. 頂部濃厚層 (波浪源頭) */
+.butter-top-layer {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%;
-    height: 10vh; /* 佔據頂部 10% */
-    background: #FFD700; /* BTS Butter 經典黃 */
-}
-
-/* 3. 靜態波浪圓球 (不再有陰影！) */
-.butter-static-drip {
-    position: absolute;
-    background: #FFD700; /* 必須跟上面同色 */
-    top: -5vh; 
-    border-radius: 50%;
-}
-
-/* 4. 動態落下水滴 (不再有陰影！) */
-.butter-drop {
-    position: absolute;
+    top: -10vh; left: -10%;
+    width: 120%; /* 寬一點避免邊緣穿幫 */
+    height: 25vh; /* 厚度 */
     background: #FFD700;
-    /* 保持完美的水滴形狀 */
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    transform-origin: center top;
-    animation: butterFall linear infinite;
+    
+    /* 🌊 波浪形狀：用 border-radius 模擬不規則流動 */
+    border-radius: 0% 0% 50% 50% / 0% 0% 20% 20%;
+    
+    /* ✨ 油亮高光 (Glossy) */
+    box-shadow: inset 0 -15px 30px rgba(255, 220, 0, 1), /* 底部深黃色堆積感 */
+                inset 0 10px 20px rgba(255, 255, 255, 0.5); /* 頂部反光 */
 }
 
-/* 落下動畫 (物理感維持) */
-@keyframes butterFall {
+/* 3. 牽絲的主角 (The Hero Drip) */
+.butter-drip-strand {
+    position: absolute;
+    top: 5vh; /* 連接在頂部層下方 */
+    background: #FFD700;
+    width: 80px; /* 初始寬度 */
+    height: 80px;
+    border-radius: 50%;
+    
+    /* ✨ 側面高光，讓它看起來圓潤立體 */
+    box-shadow: inset 10px 5px 15px rgba(255, 255, 255, 0.6),
+                inset -5px -5px 10px rgba(218, 165, 32, 0.2);
+
+    /* 應用物理動畫 */
+    transform-origin: top center;
+}
+
+/* 左邊的小滴 (陪襯) */
+.drip-left {
+    left: 20%;
+    animation: drip-small 6s infinite ease-in-out;
+    animation-delay: 1s;
+}
+
+/* 中間的主角 (超長牽絲) */
+.drip-center {
+    left: 50%;
+    transform: translateX(-50%); /* 居中 */
+    width: 100px; /* 更肥 */
+    height: 100px;
+    animation: drip-hero 8s infinite cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+
+/* 右邊的中滴 (陪襯) */
+.drip-right {
+    left: 80%;
+    animation: drip-medium 7s infinite ease-in-out;
+    animation-delay: 3s;
+}
+
+/* --- 動畫區 --- */
+
+/* 🎬 主角動畫：極致拉長 */
+@keyframes drip-hero {
     0% {
-        transform: translateY(0) scaleX(1.5) scaleY(0.5);
+        transform: translateX(-50%) scale(1, 0.5); /* 初始：扁平積蓄 */
+    }
+    30% {
+        transform: translateX(-50%) scale(0.9, 1.2) translateY(5vh); /* 開始往下流 */
+    }
+    60% {
+        /* 拉絲階段：變很細(X軸縮小)，拉很長(Y軸變大) */
+        transform: translateX(-50%) scale(0.3, 4.0) translateY(15vh); 
+    }
+    75% {
+        /* 斷裂前夕：極限拉伸 */
+        transform: translateX(-50%) scale(0.15, 6.0) translateY(25vh); 
         opacity: 1;
     }
-    10% {
-        transform: translateY(2vh) scaleX(1) scaleY(1);
-    }
-    40% {
-        transform: translateY(15vh) scaleX(0.7) scaleY(1.5); /* 牽絲 */
-    }
-    100% {
-        transform: translateY(110vh) scaleX(0.5) scaleY(1.2);
+    80% {
+        /* 斷裂！落下 */
+        transform: translateX(-50%) scale(0.5, 0.5) translateY(120vh); 
         opacity: 0;
     }
+    81% {
+        /* 瞬間彈回上面 (隱形彈回) */
+        transform: translateX(-50%) scale(1, 0) translateY(0); 
+        opacity: 0;
+    }
+    100% {
+        /* 恢復積蓄狀態 */
+        transform: translateX(-50%) scale(1, 0.5) translateY(0); 
+        opacity: 1;
+    }
+}
+
+/* 配角動畫 (比較簡單的滴落) */
+@keyframes drip-medium {
+    0% { transform: scale(1, 0.6); }
+    50% { transform: scale(0.5, 2.5) translateY(10vh); }
+    100% { transform: scale(0.2, 0.2) translateY(110vh); opacity: 0; }
+}
+
+@keyframes drip-small {
+    0% { transform: scale(1, 0.8); }
+    60% { transform: scale(0.6, 1.5) translateY(5vh); }
+    100% { transform: scale(0.3, 0.3) translateY(110vh); opacity: 0; }
 }
 
 /* 開關 */
 body.butter-on #butter-wrapper { opacity: 1; }
-
-
 
