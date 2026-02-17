@@ -779,14 +779,10 @@ body.magic-stage-2 .magic-star {
    🧈 Butter Melt 特效：融化奶油 (最終修正版)
 =========================== */
 
-/* style.css - 🧈 Butter 最終修正版 (3滴 + 波浪置頂) */
+/* style.css - 🧈 Butter 最終融合版 (漸層+物理+小水滴) */
 
 /* 隱藏 SVG 定義 */
-.svg-filter-container {
-    position: absolute;
-    width: 0; height: 0;
-    overflow: hidden;
-}
+.svg-filter-container { display: none; }
 
 /* 奶油特效容器 */
 #butter-wrapper {
@@ -801,72 +797,74 @@ body.magic-stage-2 .magic-star {
     opacity: 0;
     transition: opacity 0.5s;
     
-    /* 深黃色描邊 (漫畫感) */
-    filter: drop-shadow(2px 4px 0px rgba(180, 130, 0, 0.4));
+    /* 深色描邊 (漫畫貼紙感)，手機支援良好 */
+    filter: drop-shadow(2px 3px 0px rgba(180, 130, 0, 0.3));
 }
 
-/* 頂部波浪 SVG (🔴 圖層置頂) */
+/* 頂部波浪 (圖層置頂) */
 .butter-svg-wave {
     position: absolute;
     top: -2vh; 
     left: 0;
-    width: 100%;
+    width: 100%; 
     height: 35vh;
-    animation: melt-breathe 5s ease-in-out infinite alternate;
-    transform-origin: top center;
     
-    /* 🔴 關鍵修改：Z-Index 設高，確保蓋住水滴 */
+    /* 使用 SVG 內的漸層填充 */
+    fill: url(#butter-gradient); 
+    
+    /* 🔴 關鍵：蓋在水滴上面 */
     z-index: 10; 
 
-    /* 波浪本身的光澤 */
-    filter: drop-shadow(4px 5px 0 rgba(255,255,255,0.3));
+    animation: melt-breathe 4s ease-in-out infinite alternate;
+    transform-origin: top center;
 }
 
-/* 💧 水滴 (縮小版) */
+/* 💧 水滴 (圖層置底 + 縮小版) */
 .butter-drop {
     position: absolute;
-    background: #FFD700;
     
-    /* 確保在波浪後面 */
+    /* 使用 CSS 漸層，模擬液體立體感 */
+    background: linear-gradient(180deg, #FFD700 0%, #FFC107 100%);
+    
+    /* 🔴 關鍵：藏在波浪後面 */
     z-index: 5; 
 
-    /* 形狀維持不變 */
-    border-radius: 50% 50% 50% 50% / 70% 70% 35% 35%;
-    
+    /* 形狀：淚滴型 */
+    border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
     transform-origin: center top;
-    animation: verticalDrop linear infinite;
 
-    /* 🔴 關鍵修改：配合縮小的尺寸，高光也要縮小 */
-    /* 改成 inset -2px -2px */
+    /* 物理動畫：先慢(黏住) -> 後快(斷裂落下) */
+    animation: stickyDrop cubic-bezier(0.7, 0, 0.2, 1) infinite;
+
+    /* 右下角高光 (配合縮小尺寸，設定為 -2px) */
     box-shadow: inset -2px -2px 1px rgba(255, 255, 255, 0.8);
 }
 
 /* --- 動畫區 --- */
-
 @keyframes melt-breathe {
-    0% { transform: scaleY(1) skewX(0deg); }
-    100% { transform: scaleY(1.05) skewX(1deg); }
+    0% { transform: scaleY(1); }
+    100% { transform: scaleY(1.05); }
 }
 
-@keyframes verticalDrop {
+@keyframes stickyDrop {
     0% {
         /* 起點：藏在波浪後面 */
-        top: 10vh; 
-        transform: scaleX(1.2) scaleY(0.4); 
+        top: 8vh;
+        transform: scaleX(1.1) scaleY(0.5); /* 扁平積蓄 */
         opacity: 1;
     }
-    15% {
-        /* 探頭：露出來 */
-        top: 18vh;
+    30% {
+        /* 探頭 */
+        top: 15vh;
         transform: scale(1); 
     }
-    40% {
-        /* 拉長 */
-        top: 28vh;
-        transform: scaleX(0.8) scaleY(1.4); 
+    60% {
+        /* 重力拉扯最長的一瞬間 */
+        top: 35vh;
+        transform: scaleX(0.7) scaleY(1.6); 
     }
     100% {
-        /* 落下 */
+        /* 快速落下 */
         top: 110vh;
         transform: scaleX(0.9) scaleY(1.1);
         opacity: 0;
@@ -874,6 +872,7 @@ body.magic-stage-2 .magic-star {
 }
 
 body.butter-on #butter-wrapper { opacity: 1; }
+
 
 
 
