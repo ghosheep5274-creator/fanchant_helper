@@ -251,16 +251,27 @@
         saveToLocal();
     }
 
-    function exportJSON() {
-        const exportData = logs.map(({time, text, type}) => ({time, text, type}));
-        const jsonStr = JSON.stringify(exportData, null, 2);
+function exportJSON() {
+        // 將每一筆 log 轉換為 JSON 字串並存入陣列
+        const lineByLine = logs.map(({time, text, type}) => 
+            JSON.stringify({time, text, type})
+        );
+        
+        // 用換行符號連結，並加上外層的中括號（如果你需要符合 JSON 陣列格式）
+        // 這樣輸出的外觀會是：
+        // [
+        // {"time":123, "text":"...", "type":"..."},
+        // {"time":456, "text":"...", "type":"..."}
+        // ]
+        const jsonStr = "[\n" + lineByLine.join(",\n") + "\n]";
+        
         const textarea = document.getElementById('json-output');
         textarea.value = jsonStr;
         textarea.select();
         document.execCommand('copy');
-        alert("已複製到剪貼簿！");
+        alert("已複製到剪貼簿（每行一筆）！");
     }
-
+    
     function clearLogs() {
         if(confirm("確定要清空嗎？")) {
             logs = [];
@@ -272,6 +283,7 @@
 </script>
 </body>
 </html>
+
 
 
 
