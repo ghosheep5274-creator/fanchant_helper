@@ -115,7 +115,9 @@ const effectCommands = {
     'dynamite_end': () =>stopDynamite(),
     'purpleballoons_1': () =>startPurpleBalloons(1),
     'purpleballoons_2': () =>startPurpleBalloons(2),
-    'purpleballoons_stop': () =>stopPurpleBalloons()
+    'purpleballoons_stop': () =>stopPurpleBalloons(),
+    'ptdbackground_start': () =>startPTDBackground(),
+    'ptdbackground_stop': () =>stopPTDBackground()
 };
 
 
@@ -420,6 +422,7 @@ function finishGame() {
     clearButterEffects();
     clearDynamiteEffects();
     clearBalloonsEffects();
+    clearPTDBackgroundEffects();
     
     
     // 延遲後回首頁
@@ -449,6 +452,7 @@ function resetToTitle() {
     clearButterEffects();
     clearDynamiteEffects();
     clearBalloonsEffects();
+    clearPTDBackgroundEffects();
     updatePauseButton(false);
 }
 
@@ -1116,9 +1120,57 @@ function createBalloon(stage) {
 }
 
 
+// --- PTD 背景色彩循環模組 ---
+let ptdBgInterval;
+
+function startPTDBackground() {
+    // 防止重複建立
+    if (document.getElementById('ptd-bg-layer')) return;
+
+    const bgLayer = document.createElement('div');
+    bgLayer.id = 'ptd-bg-layer';
+    document.body.appendChild(bgLayer); // 插入到 body 最底層
+
+    // 定義馬卡龍色票 (Dynamite Palette)
+    const colors = [
+        '#FF9AA2', // 柔粉
+        '#FFDAC1', // 蜜桃
+        '#E2F0CB', // 嫩綠
+        '#B5EAD7', // 薄荷
+        '#C7CEEA'  // 薰衣草
+    ];
+    let colorIdx = 0;
+
+    // 啟動循環 (每 4 秒換一次色，配合 CSS 的 3s 轉場)
+    ptdBgInterval = setInterval(() => {
+        colorIdx = (colorIdx + 1) % colors.length;
+        bgLayer.style.backgroundColor = colors[colorIdx];
+    }, 4000);
+}
+
+function stopPTDBackground() {
+    if (ptdBgInterval) {
+        clearInterval(ptdBgInterval);
+        ptdBgInterval = null;
+    }
+    const bgLayer = document.getElementById('ptd-bg-layer');
+    if (bgLayer) {
+        // 淡出效果 (選擇性)
+        bgLayer.style.opacity = '0';
+        setTimeout(() => bgLayer.remove(), 1000);
+    }
+}
+
 // 清除特效 (用於 finishGame)
 function clearBalloonsEffects() {
     stopPurpleBalloons();
     // 如果需要完全移除元素可以寫在這裡，但通常只需要 stop 即可
 }
+
+// 清除特效 (用於 finishGame)
+function clearPTDBackgroundEffects() {
+    stopPTDBackground();
+    // 如果需要完全移除元素可以寫在這裡，但通常只需要 stop 即可
+}
+
 
