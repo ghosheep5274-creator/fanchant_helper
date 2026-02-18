@@ -112,7 +112,10 @@ const effectCommands = {
     'butter_start': () => startButter(),
     'butter_end': () => stopButter(),
     'dynamite_start': () =>startDynamite(),
-    'dynamite_end': () =>stopDynamite()
+    'dynamite_end': () =>stopDynamite(),
+    'purpleballoons_1': () =>startPurpleBalloons(1),
+    'purpleballoons_2': () =>startPurpleBalloons(2),
+    'purpleballoons_stop': () =>stopPurpleBalloons()
 };
 
 
@@ -416,6 +419,8 @@ function finishGame() {
     clearMagicEffects();  // 🔴 補上這行：清除魔法星空
     clearButterEffects();
     clearDynamiteEffects();
+    clearBalloonsEffects();
+    
     
     // 延遲後回首頁
     setTimeout(() => {
@@ -443,6 +448,7 @@ function resetToTitle() {
     clearMagicEffects(); // 🔴 補上這行：清除魔法星空
     clearButterEffects();
     clearDynamiteEffects();
+    clearBalloonsEffects();
     updatePauseButton(false);
 }
 
@@ -1014,4 +1020,105 @@ function clearDynamiteEffects() {
 }
 
 
+
+// app.js - [區域 I] 特效引擎
+
+let balloonInterval;
+let balloonLayer;
+let currentBalloonStage = 0; // 0:停止, 1:序幕, 2:慶典
+
+// 啟動氣球特效 (輸入階段 1 或 2)
+function startPurpleBalloons(stage) {
+    if (currentBalloonStage === stage) return; // 如果已經是當前階段就不重複執行
+    currentBalloonStage = stage;
+
+    // 確保容器存在
+    if (!document.getElementById('purple-balloon-layer')) {
+        balloonLayer = document.createElement('div');
+        balloonLayer.id = 'purple-balloon-layer';
+        document.body.appendChild(balloonLayer);
+    }
+
+    // 清除舊的計時器
+    if (balloonInterval) clearInterval(balloonInterval);
+
+    console.log(`[Effect] 紫色氣球啟動: 階段 ${stage}`);
+
+    // 根據階段設定生成頻率
+    // 階段 1 (序幕): 較慢，每 800ms 一顆
+    // 階段 2 (慶典): 密集，每 250ms 一顆
+    const intervalTime = stage === 1 ? 800 : 250;
+
+    balloonInterval = setInterval(() => {
+        createBalloon(stage);
+    }, intervalTime);
+}
+
+// 停止特效
+function stopPurpleBalloons() {
+    if (balloonInterval) {
+        clearInterval(balloonInterval);
+        balloonInterval = null;
+    }
+    currentBalloonStage = 0;
+    // 可選擇是否要立刻移除所有氣球，或者讓它們自然飄完
+    // document.getElementById('purple-balloon-layer')?.remove(); 
+    console.log('[Effect] 紫色氣球停止');
+}
+
+// 建立單顆氣球的核心函式
+function createBalloon(stage) {
+    if (!balloonLayer) return;
+
+    const balloon = document.createElement('div');
+    balloon.classList.add('balloon');
+
+    // 1. 隨機顏色深淺 (1~3)
+    const shade = Math.floor(Math.random() * 3) + 1;
+    balloon.classList.add(`shade-${shade}`);
+
+    // 2. 根據階段設定參數
+    let size, duration;
+    if (stage === 1) {
+        // 階段 1: 較小，較慢
+        size = Math.random() * 20 + 30; // 30px ~ 50px
+        duration = Math.random() * 4 + 8; // 8s ~ 12s (飄很慢)
+    } else {
+        // 階段 2: 較大，較快
+        size = Math.random() * 30 + 40; // 40px ~ 70px (加入大氣球)
+        duration = Math.random() * 3 + 5; // 5s ~ 8s (飄比較快)
+    }
+
+    // 3. 設定 CSS 變數給動畫使用
+    balloon.style.setProperty('--size', `${size}px`);
+    balloon.style.setProperty('--duration', `${duration}s`);
+    balloon.style.setProperty('--delay', `${Math.random() * 2}s`); // 隨機延遲出發
+
+    // 隨機起始 X 位置 (0% ~ 100%)
+    balloon.style.left = `${Math.random() * 100}%`;
+
+    // 隨機左右飄移量 (-100px ~ 100px)
+    const driftX = Math.random() * 200 - 100;
+    balloon.style.setProperty('--drift-x', `${driftX}px`);
+
+    // 隨機輕微旋轉 (-30deg ~ 30deg)
+    const rot = Math.random() * 60 - 30;
+    balloon.style.setProperty('--rot', `${rot}deg`);
+
+    // 4. 加入畫面
+    balloonLayer.appendChild(balloon);
+
+    // 5. 動畫結束後移除元素 (重要！防止手機卡頓)
+    // 這裡用一個比動畫時間稍長的 timeout 來移除
+    setTimeout(() => {
+        balloon.remove();
+    }, (duration + 2) * 1000); 
+}
+
+
+// 清除特效 (用於 finishGame)
+function clearBalloonsEffects() {
+    stopPurpleBalloons();
+    // 如果需要完全移除元素可以寫在這裡，但通常只需要 stop 即可
+}
 
