@@ -65,5 +65,11 @@ const songLibrary = {
         videoId: "f_ECYkGeWtI",
         bpm: 62.5,
         file: "lyrics/permission_to_dance.json"
+     },
+    "no_more_dream": {
+        title: "🛹 No More Dream",
+        videoId: "LCfKK7QP-e4",
+        bpm: 84,
+        file: "lyrics/no_more_dream.json"
     }
 };
