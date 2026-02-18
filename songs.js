@@ -71,5 +71,11 @@ const songLibrary = {
         videoId: "LCfKK7QP-e4",
         bpm: 84,
         file: "lyrics/no_more_dream.json"
+     },
+    "boy_in_luv": {
+        title: "🛹 Boy In Luv",
+        videoId: "hK-d1cM8hT0",
+        bpm: 83,
+        file: "lyrics/boy_in_luv.json"
     }
 };
