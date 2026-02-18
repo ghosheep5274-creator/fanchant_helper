@@ -932,6 +932,24 @@ body.butter-on #butter-wrapper { opacity: 1; }
 
 /* style.css - 💜 Borahae 紫色氣球特效 */
 
+
+/* PTD 專用背景層 (馬卡龍色循環) */
+#ptd-bg-layer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    
+    /* 🔴 關鍵：放在最底層，但在純黑背景之上 */
+    z-index: -1; 
+    
+    /* 預設顏色 (Dynamite 粉) */
+    background-color: #FF9AA2;
+    
+    /* 讓顏色切換像呼吸一樣柔和，不要生硬跳轉 */
+    transition: background-color 3s ease;
+}
+
+
 /* 氣球容器層 */
 #purple-balloon-layer {
     position: fixed;
@@ -1025,3 +1043,4 @@ body.butter-on #butter-wrapper { opacity: 1; }
         transform: translate3d(calc(var(--drift-x) * -1), -120vh, 0) rotate(var(--rot));
     }
 }
+
