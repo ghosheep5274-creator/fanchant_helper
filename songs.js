@@ -87,7 +87,7 @@ const songLibrary = {
     "fake_love": {
         title: "🎭 FAKE LOVE",
         videoId: "Uxthy8aJzGA",
-        bpm: 78,
+        bpm: 39,
         file: "lyrics/fake_love.json"
     },
     "run": {
