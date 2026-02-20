@@ -101,5 +101,11 @@ const songLibrary = {
         videoId: "iDevJV8RCck",
         bpm: 75,
         file: "lyrics/save_me.json"
+        },
+    "i_m_fine": {
+        title: "👌 I'm Fine",
+        videoId: "6bDTf7CK8p0",
+        bpm: 44,
+        file: "lyrics/i_m_fine.json"
     }
 };
