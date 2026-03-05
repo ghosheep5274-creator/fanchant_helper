@@ -1,4 +1,5 @@
 [
+  { "time": 500, "text": "Waiting for beat...", "type": "wait" },
   { "time": 16100, "text": "WARNING!", "type": "warning" },
   { "time": 18427, "text": "not today-①", "type": "chant" },
   { "time": 22779, "text": "not today-②", "type": "chant" },
