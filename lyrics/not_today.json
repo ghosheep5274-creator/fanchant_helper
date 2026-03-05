@@ -73,5 +73,5 @@
   { "time": 219463, "text": "Not not today-③", "type": "chant" },
   { "time": 221602, "text": "Not not today-④", "type": "chant" },
   { "time": 223749, "text": "Not not today-⑤", "type": "chant" },
-  { "time": 231264, "": "end", "type": "end" }
+  { "time": 231264, "text": "", "type": "end" }
 ]
