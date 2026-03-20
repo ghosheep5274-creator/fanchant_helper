@@ -1046,118 +1046,107 @@ body.butter-on #butter-wrapper { opacity: 1; }
 
 
 /* ===========================
-   🌊 Deep Sea Mode (Underwater Rays)
+   🌊 Deep Sea Mode (修正強化版)
    =========================== */
 
-/* 深海主容器 - 預設隱藏 */
 #deep-sea-layer {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100vh;
-    z-index: -3; /* 確保在夕陽 (-2) 之下，最底層 */
-    display: none; /* 初始隱藏，由程式啟動 */
+    z-index: -5; /* 放在最底層 */
+    display: none;
     opacity: 0;
-    transition: opacity 1.5s ease-in-out;
+    transition: opacity 2s ease-in-out;
+    background: #001220; /* 極深藍底色 */
     overflow: hidden;
 }
 
-/* 啟動時淡入 */
 #deep-sea-layer.active {
     display: block;
     opacity: 1;
 }
 
-/* 1. 深海基礎背景與透射光影 (God Rays / Caustics) */
+/* 1. 底層深海漸層：從上方稍亮到下方全黑 */
 #deep-sea-layer::before {
-    content: "";
-    position: absolute;
-    top: -20%; /* 向上延伸，留白給搖擺 */
-    left: -10%;
-    width: 120%;
-    height: 140%;
-    
-    /* 深藍海基底漸層 (參考圖片色系：深藍 -> 墨藍) */
-    background: linear-gradient(180deg, #1A4D80 0%, #001A33 100%);
-    
-    /* 這裡使用一個複雜的多層漸層組合來模擬「幾絲光影」 */
-    /* 1. 第一層：上方的水面強光亮區 */
-    background-image: linear-gradient(180deg, 
-                        rgba(204, 238, 255, 0.4) 0%, 
-                        rgba(204, 238, 255, 0) 50%),
-    
-    /* 2. 第二層：利用重複的徑向漸層來模擬幾絲光束 (光線質感較硬) */
-                      repeating-radial-gradient(ellipse at 50% -20%, 
-                        rgba(255, 255, 255, 0.0) 0px, 
-                        rgba(255, 255, 255, 0.05) 10px, 
-                        rgba(255, 255, 255, 0) 15px);
-    
-    /* 3. 第三層：原本的深海漸層 */
-    background-image: linear-gradient(180deg, #1A4D80 0%, #001A33 100%); /* 備用 base */
-
-    /* 將上面幾層混合：利用層次疊加產生複雜度 */
-    background-image: linear-gradient(180deg, #1A4D80 0%, #001A33 100%), /* Base */
-                      linear-gradient(180deg, rgba(160, 220, 255, 0.25) 0%, rgba(160, 220, 255, 0) 60%), /* Top light */
-                      repeating-linear-gradient(65deg, /* 斜向光束 */
-                        rgba(255, 255, 255, 0) 0px, 
-                        rgba(255, 255, 255, 0) 50px, 
-                        rgba(255, 255, 255, 0.04) 60px, 
-                        rgba(255, 255, 255, 0) 80px);
-    
-    /* 4. 關鍵：加上一個 SVG 濾鏡或一個遮罩來模擬不規則的水紋 */
-    /* 為簡化手機相容性，我們這裡使用一個複雜的 repeating-gradient 代替濾鏡 */
-    
-    mask-image: linear-gradient(to bottom, white 50%, transparent 100%); /* 讓下方自然淡出 */
-    
-    /* 執行動畫：波浪搖曳 */
-    animation: seaLightRaysShift 15s ease-in-out infinite;
-    transform-origin: 50% 0%; /* 以頂部為中心搖擺 */
-}
-
-/* 2. 上方水面波紋亮點 (Caustics) - 疊加一層 */
-#deep-sea-layer::after {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 30vh; /* 只有上方一小段 */
-    background-image: repeating-conic-gradient(
-        from 0deg at 50% 0%, 
-        rgba(255, 255, 255, 0) 0deg 20deg, 
-        rgba(255, 255, 255, 0.03) 25deg, 
-        rgba(255, 255, 255, 0) 30deg 360deg
-    );
-    filter: blur(8px); /* 讓光紋變柔和 */
-    opacity: 0.6;
-    animation: seaSurfaceWobble 6s ease-in-out infinite alternate;
+    height: 100%;
+    background: linear-gradient(180deg, 
+        #1A4D80 0%, 
+        #08203E 40%, 
+        #000000 100%);
+    z-index: 1;
 }
 
-
-/* --- 🌊 深海特效 Keyframes --- */
-
-/* 特效 1: 幾絲光束的整體左右、 skew 搖曳 (模擬波浪透射) */
-@keyframes seaLightRaysShift {
-    0%, 100% {
-        transform: translate(0, 0) scale(1) skewX(0deg);
-        filter: brightness(1);
-    }
-    50% {
-        transform: translate(-3%, 2%) scale(1.05) skewX(3deg); /* 產生拉伸與傾斜 */
-        filter: brightness(1.15); /* 搖擺到特定角度時變亮，模擬光線聚集 */
-    }
+/* 2. 幾絲光影層：使用重複線性漸層製作「光束」 */
+#deep-sea-layer::after {
+    content: "";
+    position: absolute;
+    top: -50%; /* 延伸出去方便搖擺 */
+    left: -20%;
+    width: 140%;
+    height: 200%;
+    z-index: 2;
+    
+    /* 核心：將多層光束合併在一個 background-image 裡 */
+    background-image: 
+        /* 第一層：寬光束 */
+        repeating-linear-gradient(75deg, 
+            transparent 0%, 
+            transparent 15%, 
+            rgba(255, 255, 255, 0.08) 20%, 
+            transparent 25%
+        ),
+        /* 第二層：細光束 (角度不同增加層次) */
+        repeating-linear-gradient(105deg, 
+            transparent 0%, 
+            transparent 10%, 
+            rgba(200, 240, 255, 0.05) 12%, 
+            transparent 14%
+        );
+    
+    /* 柔化光影邊緣 */
+    filter: blur(15px);
+    
+    /* 執行動畫：讓光影隨著波浪搖曳 */
+    animation: seaLightDance 12s ease-in-out infinite alternate;
+    pointer-events: none;
 }
 
-/* 特效 2: 上方水面波紋的輕微不規則搖晃 */
-@keyframes seaSurfaceWobble {
+/* 3. 上方水面亮紋 (Caustics) - 額外加一層模擬水面感 */
+.sea-surface {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    z-index: 3;
+    background: radial-gradient(circle at 50% -20%, 
+        rgba(255, 255, 255, 0.15) 0%, 
+        transparent 70%);
+    mix-blend-mode: screen;
+    animation: seaSurfacePulse 8s ease-in-out infinite alternate;
+}
+
+/* --- 🌊 搖曳動畫 --- */
+
+@keyframes seaLightDance {
     0% {
-        transform: scaleX(1) translateY(0px);
-        opacity: 0.5;
+        transform: rotate(-5deg) translateX(-20px);
+        opacity: 0.6;
     }
     100% {
-        transform: scaleX(1.1) translateY(-10px); /* 水面輕微浮動 */
-        opacity: 0.8;
+        transform: rotate(5deg) translateX(20px);
+        opacity: 1;
     }
 }
 
+@keyframes seaSurfacePulse {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 0.7; transform: scale(1.1); }
+}
