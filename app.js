@@ -117,7 +117,10 @@ const effectCommands = {
     'purpleballoons_2': () =>startPurpleBalloons(2),
     'purpleballoons_stop': () =>stopPurpleBalloons(),
     'ptdbackground_start': () =>startPTDBackground(),
-    'ptdbackground_stop': () =>stopPTDBackground()
+    'ptdbackground_stop': () =>stopPTDBackground(),
+    // --- 🌊 新增深海指令 ---
+    'deep_sea_start': () => startDeepSea(),
+    'deep_sea_stop': () => stopDeepSea()
 };
 
 
@@ -423,6 +426,7 @@ function finishGame() {
     clearDynamiteEffects();
     clearBalloonsEffects();
     clearPTDBackgroundEffects();
+    clearDeepSeaEffects();
     
     
     // 延遲後回首頁
@@ -453,6 +457,7 @@ function resetToTitle() {
     clearDynamiteEffects();
     clearBalloonsEffects();
     clearPTDBackgroundEffects();
+    clearDeepSeaEffects();
     updatePauseButton(false);
 }
 
@@ -1171,6 +1176,53 @@ function clearBalloonsEffects() {
 function clearPTDBackgroundEffects() {
     stopPTDBackground();
     // 如果需要完全移除元素可以寫在這裡，但通常只需要 stop 即可
+}
+
+
+// ===========================
+// 🌊 Deep Sea Mode Engine
+// ===========================
+
+// 初始化深海層 (造水)
+function initDeepSea() {
+    // 1. 如果已經有深海層，就不要重複建立
+    if (document.getElementById('deep-sea-layer')) return;
+
+    console.log("🌊 正在準備深海場景...");
+
+    // 2. 建立主容器 div
+    const seaLayer = document.createElement('div');
+    seaLayer.id = 'deep-sea-layer';
+    
+    // 3. 把它插在 body 的最前面 (同夕陽層 initEffects 邏輯)，確保在文字後面
+    document.body.insertBefore(seaLayer, document.body.firstChild);
+}
+
+// 啟動深海特效
+function startDeepSea() {
+    initDeepSea(); // 確保元素存在
+    
+    console.log("🌊 深海模式：啟動");
+    const sea = document.getElementById('deep-sea-layer');
+    if (sea) {
+        sea.classList.add('active'); // 加上 .active 觸發 CSS 的淡入和顯示
+    }
+}
+
+// 停止深海特效生成/顯示 (不一定需要立即移除元素，只需淡出)
+function stopDeepSea() {
+    console.log("🌊 深海模式：停止");
+    const sea = document.getElementById('deep-sea-layer');
+    if (sea) {
+        sea.classList.remove('active'); // 移除 .active 觸發 CSS 的淡出
+    }
+}
+
+// 強制清除深海特效 (回首頁或切換歌曲時用)
+function clearDeepSeaEffects() {
+    stopDeepSea();
+    // 如果需要完全移除元素可以解鎖下面這行，但通常淡出即可
+    // setTimeout(() => document.getElementById('deep-sea-layer')?.remove(), 2000); 
 }
 
 
