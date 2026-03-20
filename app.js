@@ -1183,38 +1183,39 @@ function clearPTDBackgroundEffects() {
 // 🌊 Deep Sea Mode Engine
 // ===========================
 
-// 初始化深海層 (造水)
+// 初始化深海層
 function initDeepSea() {
-    // 1. 如果已經有深海層，就不要重複建立
     if (document.getElementById('deep-sea-layer')) return;
 
-    console.log("🌊 正在準備深海場景...");
-
-    // 2. 建立主容器 div
     const seaLayer = document.createElement('div');
     seaLayer.id = 'deep-sea-layer';
     
-    // 3. 把它插在 body 的最前面 (同夕陽層 initEffects 邏輯)，確保在文字後面
+    // 加上水面亮紋子元素
+    const surface = document.createElement('div');
+    surface.className = 'sea-surface';
+    seaLayer.appendChild(surface);
+    
     document.body.insertBefore(seaLayer, document.body.firstChild);
 }
 
 // 啟動深海特效
 function startDeepSea() {
-    initDeepSea(); // 確保元素存在
-    
-    console.log("🌊 深海模式：啟動");
+    initDeepSea();
     const sea = document.getElementById('deep-sea-layer');
     if (sea) {
-        sea.classList.add('active'); // 加上 .active 觸發 CSS 的淡入和顯示
+        sea.style.display = 'block'; // 先顯示
+        setTimeout(() => sea.classList.add('active'), 50); // 再淡入
     }
 }
 
-// 停止深海特效生成/顯示 (不一定需要立即移除元素，只需淡出)
+// 停止與清除 (這部分保持跟之前建議的一樣即可，但要確保 resetToTitle 有呼叫到)
 function stopDeepSea() {
-    console.log("🌊 深海模式：停止");
     const sea = document.getElementById('deep-sea-layer');
     if (sea) {
-        sea.classList.remove('active'); // 移除 .active 觸發 CSS 的淡出
+        sea.classList.remove('active');
+        setTimeout(() => { 
+            if(!sea.classList.contains('active')) sea.style.display = 'none'; 
+        }, 2000);
     }
 }
 
