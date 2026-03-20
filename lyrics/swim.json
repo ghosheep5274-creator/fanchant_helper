@@ -1,4 +1,5 @@
 [
+{ "time": 100, "text": "", "type": "deep_sea_start" },
 { "time": 500, "text": "Waiting for beat...", "type": "wait" },
 {"time":4137,"text":"Swim, swim-①","type":"sing"},
 {"time":9162,"text":"Swim, swim-②","type":"sing"},
@@ -33,5 +34,6 @@
 {"time":136897,"text":"Swim, swim-①","type":"sing"},
 {"time":141953,"text":"Swim, swim-②","type":"sing"},
 {"time":156738,"text":"🔦scream!!!","type":"scream"},
+{"time":157500, "text": "", "type": "deep_sea_end" },
 {"time":157600,"text":"","type":"end"}
 ]
