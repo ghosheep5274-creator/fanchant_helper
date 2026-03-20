@@ -1,5 +1,11 @@
 // songs.js - 純索引版
 const songLibrary = {
+    "swim": {
+        title: "⛵ SWIM",
+        videoId: "wt08t0fu53E",
+        bpm: 47,
+        file: "lyrics/swim.json" // 指向檔案
+    },
     "mic_drop": {
         title: "🎤 MIC Drop",
         videoId: "Zos_33vzX0w",
